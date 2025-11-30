@@ -1,183 +1,14 @@
 {
-  "python.defaultInterpreterPath": "e:\\DEV\\Python\\Python314\\python.exe",
-  "redhat.telemetry.enabled": true,
-  "cmake.configureOnOpen": true,
-  "dotnetAcquisitionExtension.existingDotnetPath": [
-    {
-      "extensionId": "msazurermtools.azurerm-vscode-tools",
-      "path": "C:\\Program Files\\dotnet\\dotnet.exe"
-    }
-  ],
-  "hediet.vscode-drawio.resizeImages": null,
-  "notebook.lineNumbers": "on",
-  "workbench.startupEditor": "none",
-  "workbench.iconTheme": "vscode-icons",
-  "[css]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  "workbench.colorTheme": "Default Light Modern",
+  "editor.fontFamily": "JetBrains Mono NL, LXGW WenKai Mono,'Courier New', monospace",
+  "editor.quickSuggestions": {
+    "strings": "on",
+    "comments": "on"
   },
-  "[javascript]": {
-    "editor.defaultFormatter": "vscode.typescript-language-features"
-  },
-  "[python]": {
-    "editor.formatOnType": true,
-    "editor.defaultFormatter": "charliermarsh.ruff"
-  },
-  "java.import.gradle.home": "",
-  "java.import.gradle.java.home": "",
-  "[html]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "pandoc.executable": "D:\\pandoc\\pandoc.exe",
-  "pandoc.pdfOptString": "--template E:\\Desktop\\mynote\\template\\eisvogel.latex --listings",
-  "svg.preview.mode": "svg",
-  "[makefile]": {
-    "editor.insertSpaces": false
-  },
-  "editor.language.colorizedBracketPairs": [],
-  "[csharp]": {
-    "editor.defaultFormatter": "ms-dotnettools.csharp"
-  },
-  "[jsonc]": {
-    "editor.defaultFormatter": "vscode.json-language-features"
-  },
-  "hexeditor.columnWidth": 20,
-  "hexeditor.showDecodedText": true,
-  "hexeditor.defaultEndianness": "little",
-  "hexeditor.inspectorType": "aside",
-  "[json]": {
-    "editor.defaultFormatter": "vscode.json-language-features"
-  },
-  "solidity.packageDefaultDependenciesDirectory": "",
-  "[solidity]": {
-    "editor.defaultFormatter": "JuanBlanco.solidity"
-  },
-  "eslint.execArgv": null,
-  "notebook.formatOnCellExecution": true,
-  "editor.unicodeHighlight.nonBasicASCII": false,
-  "html.format.contentUnformatted": "",
-  "[svg]": {
-    "editor.defaultFormatter": "jock.svg"
-  },
-  "[typescript]": {
-    "editor.defaultFormatter": "vscode.typescript-language-features"
-  },
-  "[vue]": {
-    "editor.defaultFormatter": "Vue.volar"
-  },
-  "[typescriptreact]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "maui.configuration.androidSdkPreferredPath": "d:\\Android\\Sdk",
-  "github.copilot.enable": {
-    "*": true,
-    "plaintext": false,
-    "markdown": false,
-    "scminput": false,
-    "quarto": false,
-    "rust": false,
-    "typescript": true,
-    "polyglot-notebook": false,
-    "go": false,
-    "python": false,
-    "dart": true,
-    "java": false,
-    "cpp": false,
-    "zig": false,
-    "kotlin": false
-  },
-  "editor.fontLigatures": true,
-  "editor.fontFamily": "JetBrains Mono NL, 'Courier New', monospace",
-  "[latex]": {
-    "editor.defaultFormatter": "James-Yu.latex-workshop"
-  },
-  "[ruby]": {
-    "editor.defaultFormatter": "Shopify.ruby-lsp",
-    "editor.formatOnSave": true,
-    "editor.formatOnType": true,
-    "editor.tabSize": 2,
-    "editor.insertSpaces": true,
-    "files.trimTrailingWhitespace": true,
-    "files.insertFinalNewline": true,
-    "files.trimFinalNewlines": true,
-    "editor.rulers": [
-      120
-    ],
-    "editor.semanticHighlighting.enabled": true
-  },
-  "oxc_language_server.enable": true,
-  "go.toolsManagement.autoUpdate": true,
-  "files.associations": {
-    "*.graphql": "graphql",
-    "*.graphqls": "graphql"
-  },
-  "[scss]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "[graphql]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "vs-kubernetes": {
-    "vscode-kubernetes.helm-path-windows": "C:\\Users\\HW\\.vs-kubernetes\\tools\\helm\\windows-amd64\\helm.exe"
-  },
-  "java.configuration.maven.globalSettings": "E:\\.m2\\settings.xml",
-  "diffEditor.ignoreTrimWhitespace": false,
   "terminal.integrated.fontFamily": "JetBrainsMono Nerd Font Mono",
-  "cmake.options.statusBarVisibility": "visible",
-  "prisma.showPrismaDataPlatformNotification": false,
-  "yaml.schemas": {
-    "file:///c%3A/Users/HW/.vscode/extensions/docsmsft.docs-yaml-1.0.5/dist/toc.schema.json": "/toc\\.yml/i"
-  },
-  "github.copilot.editor.enableAutoCompletions": true,
-  "[yaml]": {
-    "editor.defaultFormatter": "redhat.vscode-yaml"
-  },
-  "code-runner.runInTerminal": true,
-  "maven.settingsFile": "E:\\.m2\\settings.xml",
-  "java.configuration.maven.userSettings": "E:\\.m2\\settings.xml",
-  "maven.terminal.useJavaHome": true,
-  "files.watcherExclude": {
-    "**/.bloop": true,
-    "**/.metals": true,
-    "**/.ammonite": true
-  },
-  "[java]": {
-    "editor.defaultFormatter": "redhat.java"
-  },
-  "scm.experimental.showHistoryGraph": true,
-  "rust-analyzer.inlayHints.reborrowHints.enable": "always",
-  "rust-analyzer.inlayHints.lifetimeElisionHints.enable": "always",
-  "rust-analyzer.inlayHints.discriminantHints.enable": "always",
-  "rust-analyzer.inlayHints.expressionAdjustmentHints.enable": "always",
-  "rust-analyzer.inlayHints.closureReturnTypeHints.enable": "always",
-  "rust-analyzer.inlayHints.closureCaptureHints.enable": true,
-  "rust-analyzer.inlayHints.implicitDrops.enable": true,
-  "rust-analyzer.inlayHints.rangeExclusiveHints.enable": true,
-  "rust-analyzer.inlayHints.genericParameterHints.lifetime.enable": true,
-  "rust-analyzer.inlayHints.genericParameterHints.type.enable": true,
-  "rust-analyzer.inlayHints.bindingModeHints.enable": true,
-  "rust-analyzer.inlayHints.lifetimeElisionHints.useParameterNames": true,
-  "editor.linkedEditing": true,
-  "luahelper.format.continuation_indent_width": 2,
-  "luahelper.format.indent_width": 2,
-  "luahelper.format.tab_width": 2,
-  "maven.executable.preferMavenWrapper": true,
+  "terminal.integrated.suggest.enabled": true,
   "git.blame.statusBarItem.enabled": true,
   "git.blame.editorDecoration.enabled": true,
-  "git.autoStash": true,
-  "[typst]": {
-    "editor.wordSeparators": "`~!@#$%^&*()=+[{]}\\|;:'\",.<>/?"
-  },
-  "[typst-code]": {
-    "editor.wordSeparators": "`~!@#$%^&*()=+[{]}\\|;:'\",.<>/?"
-  },
-  "java.autobuild.enabled": false,
-  "[markdown]": {
-    "diffEditor.ignoreTrimWhitespace": true,
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "kotlin.scripts.buildScriptsEnabled": true,
-  "dart.previewFlutterUiGuides": true,
-  "terminal.integrated.suggest.enabled": true,
   "C_Cpp.inlayHints.autoDeclarationTypes.enabled": true,
   "C_Cpp.inlayHints.parameterNames.enabled": true,
   "C_Cpp.inlayHints.referenceOperator.enabled": true,
@@ -196,11 +27,7 @@
   "go.inlayHints.functionTypeParameters": true,
   "go.inlayHints.parameterNames": true,
   "go.inlayHints.rangeVariableTypes": true,
-  "python.analysis.inlayHints.functionReturnTypes": true,
-  "python.analysis.inlayHints.pytestParameters": true,
-  "python.analysis.inlayHints.variableTypes": true,
-  "rust-analyzer.inlayHints.expressionAdjustmentHints.hideOutsideUnsafe": true,
-  "rust-analyzer.inlayHints.implicitSizedBoundHints.enable": true,
+  "go.toolsManagement.autoUpdate": true,
   "javascript.inlayHints.functionLikeReturnTypes.enabled": true,
   "javascript.inlayHints.parameterTypes.enabled": true,
   "javascript.inlayHints.propertyDeclarationTypes.enabled": true,
@@ -215,71 +42,32 @@
   "vue.inlayHints.missingProps": true,
   "vue.inlayHints.optionsWrapper": true,
   "vue.inlayHints.vBindShorthand": true,
-  "extensions.experimental.affinity": {
-    "asvetliakov.vscode-neovim": 1
-  },
-  "workbench.editor.autoLockGroups": {
-    "hexEditor.hexedit": true
-  },
-  "java.imports.gradle.wrapper.checksums": [
-    {
-      "sha256": "e2b82129ab64751fd40437007bd2f7f2afb3c6e41a9198e628650b22d5824a14",
-      "allowed": true
-    }
-  ],
+  "python.analysis.inlayHints.functionReturnTypes": true,
+  "python.analysis.inlayHints.pytestParameters": true,
+  "python.analysis.inlayHints.variableTypes": true,
   "python.analysis.autoImportCompletions": true,
   "python.analysis.autoFormatStrings": true,
   "python.analysis.completeFunctionParens": true,
   "debugpy.showPythonInlineValues": true,
-  "zig.path": "E:\\DEV\\Zig\\zig.exe",
-  "zig.zls.enabled": "on",
   "python.analysis.typeEvaluation.strictListInference": true,
   "python.analysis.typeEvaluation.strictSetInference": true,
   "python.analysis.typeEvaluation.strictDictionaryInference": true,
   "python.analysis.supportDocstringTemplate": true,
-  "python.analysis.extraPaths": [
-    "./.venv\\Lib\\site-packages",
-    "E:\\DEV\\Python\\Python313\\Lib\\site-packages"
-  ],
   "python.analysis.typeCheckingMode": "standard",
-  "workbench.colorTheme": "Default Light Modern",
-  "vsicons.associations.files": [
-    {
-      "icon": "kotlin",
-      "extensions": [
-        "kt"
-      ],
-      "format": "svg"
-    }
-  ],
-  "polyglot-notebook.defaultNotebookLanguage": "csharp",
-  "update.showReleaseNotes": false,
-  "qt-core.additionalQtPaths": [
-    {
-      "name": "Qt-6.9.2-win32-msvc_from_PATH",
-      "path": "E:\\DEV\\Qt\\6.9.2\\msvc2022_64\\bin\\qtpaths.EXE"
-    }
-  ],
-  "docker.extension.enableComposeLanguageServer": false,
-  "[dockercompose]": {
-    "editor.insertSpaces": true,
-    "editor.tabSize": 2,
-    "editor.autoIndent": "advanced",
-    "editor.quickSuggestions": {
-      "other": true,
-      "comments": false,
-      "strings": true
-    },
-    "editor.defaultFormatter": "redhat.vscode-yaml"
-  },
-  "[github-actions-workflow]": {
-    "editor.defaultFormatter": "redhat.vscode-yaml"
-  },
-  "[astro]": {
-    "editor.defaultFormatter": "astro-build.astro-vscode"
-  },
-  "editor.quickSuggestions": {
-    "strings": "on",
-    "comments": "on"
-  },
+  "rust-analyzer.inlayHints.reborrowHints.enable": "always",
+  "rust-analyzer.inlayHints.lifetimeElisionHints.enable": "always",
+  "rust-analyzer.inlayHints.discriminantHints.enable": "always",
+  "rust-analyzer.inlayHints.expressionAdjustmentHints.enable": "always",
+  "rust-analyzer.inlayHints.closureReturnTypeHints.enable": "always",
+  "rust-analyzer.inlayHints.closureCaptureHints.enable": true,
+  "rust-analyzer.inlayHints.implicitDrops.enable": true,
+  "rust-analyzer.inlayHints.rangeExclusiveHints.enable": true,
+  "rust-analyzer.inlayHints.genericParameterHints.lifetime.enable": true,
+  "rust-analyzer.inlayHints.genericParameterHints.type.enable": true,
+  "rust-analyzer.inlayHints.bindingModeHints.enable": true,
+  "rust-analyzer.inlayHints.lifetimeElisionHints.useParameterNames": true,
+  "rust-analyzer.inlayHints.expressionAdjustmentHints.hideOutsideUnsafe": true,
+  "rust-analyzer.inlayHints.implicitSizedBoundHints.enable": true,
+  "zig.zls.enabled": "on",
+  "github.copilot.editor.enableAutoCompletions": true
 }
