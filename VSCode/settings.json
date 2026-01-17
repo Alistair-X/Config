@@ -1,5 +1,13 @@
 {
   "workbench.colorTheme": "Default Light Modern",
+  // 文件夹缩进
+  "workbench.tree.indent": 15,
+  // 文件夹选中高亮
+  "workbench.tree.renderIndentGuides": "always",
+  // 缩进线颜色
+  "workbench.colorCustomizations": {
+    "tree.indentGuidesStroke": "#87b5eb"
+  },
   "editor.fontFamily": "JetBrains Mono NL, LXGW WenKai Mono,'Courier New', monospace",
   "editor.quickSuggestions": {
     "strings": "on",
@@ -42,13 +50,13 @@
   "vue.inlayHints.missingProps": true,
   "vue.inlayHints.optionsWrapper": true,
   "vue.inlayHints.vBindShorthand": true,
+  "debugpy.showPythonInlineValues": true,
   "python.analysis.inlayHints.functionReturnTypes": true,
   "python.analysis.inlayHints.pytestParameters": true,
   "python.analysis.inlayHints.variableTypes": true,
   "python.analysis.autoImportCompletions": true,
   "python.analysis.autoFormatStrings": true,
   "python.analysis.completeFunctionParens": true,
-  "debugpy.showPythonInlineValues": true,
   "python.analysis.typeEvaluation.strictListInference": true,
   "python.analysis.typeEvaluation.strictSetInference": true,
   "python.analysis.typeEvaluation.strictDictionaryInference": true,
@@ -68,6 +76,5 @@
   "rust-analyzer.inlayHints.lifetimeElisionHints.useParameterNames": true,
   "rust-analyzer.inlayHints.expressionAdjustmentHints.hideOutsideUnsafe": true,
   "rust-analyzer.inlayHints.implicitSizedBoundHints.enable": true,
-  "zig.zls.enabled": "on",
-  "github.copilot.editor.enableAutoCompletions": true
+  "zig.zls.enabled": "on"
 }
