@@ -1,0 +1,2242 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "$ref": "#/definitions/ConfigObject",
+  "$comment": "Work in progress, Updated 2021-04-29 for Xray-core v1.4.2",
+  "definitions": {
+    "ConfigObject": {
+      "title": "Xray 配置",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "$schema": {
+          "type": "string",
+          "format": "uri-reference"
+        },
+        "log": {
+          "$ref": "#/definitions/LogObject"
+        },
+        "api": {
+          "$ref": "#/definitions/ApiObject"
+        },
+        "dns": {
+          "$ref": "#/definitions/DnsObject"
+        },
+        "routing": {
+          "$ref": "#/definitions/RoutingObject"
+        },
+        "policy": {
+          "$ref": "#/definitions/PolicyObject"
+        },
+        "inbounds": {
+          "title": "入站连接",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/InboundObject"
+          }
+        },
+        "outbounds": {
+          "title": "出站连接",
+          "description": "列表中的第一个元素作为主 outbound。当路由匹配不存在或没有匹配成功时，流量由主 outbound 发出。",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/OutboundObject"
+          }
+        },
+        "transport": {
+          "$ref": "#/definitions/StreamSettingsObject"
+        },
+        "stats": {
+          "$ref": "#/definitions/StatsObject"
+        },
+        "reverse": {
+          "$ref": "#/definitions/ReverseObject"
+        },
+        "fakedns": {
+          "$ref": "#/definitions/FakeDnsObject"
+        }
+      },
+      "examples": [
+        {
+          "log": {},
+          "api": {},
+          "dns": {},
+          "routing": {},
+          "policy": {},
+          "inbounds": [],
+          "outbounds": [],
+          "transport": {},
+          "stats": {},
+          "reverse": {},
+          "fakedns": {}
+        }
+      ]
+    },
+    "LogObject": {
+      "title": "日志配置",
+      "description": "控制 Xray 输出日志的方式。",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "access": {
+          "title": "访问日志的文件地址",
+          "description": "当此项不指定或为空值时，表示将日志输出至 stdout 。特殊值 none ，即关闭访问日志。",
+          "type": "string",
+          "examples": [
+            "/var/log/Xray/access.log",
+            "C:\\Temp\\Xray\\_access.log",
+            "none"
+          ]
+        },
+        "error": {
+          "title": "错误日志的文件地址",
+          "description": "当此项不指定或为空值时，表示将日志输出至 stdout 。特殊值 none ，即关闭错误日志。",
+          "type": "string",
+          "examples": [
+            "/var/log/Xray/error.log",
+            "C:\\Temp\\Xray\\_error.log",
+            "none"
+          ]
+        },
+        "loglevel": {
+          "title": "错误日志的级别",
+          "description": "指示错误日志需要记录的信息。",
+          "enum": ["debug", "info", "warning", "error", "none"],
+          "default": "warning"
+        },
+        "dnsLog": {
+          "title": "是否启用 DNS 查询日志",
+          "type": "boolean",
+          "default": false
+        },
+        "maskAddress": {
+          "title": "IP地址遮罩",
+          "description": "启用后将自动替换log中出现的IP地址，用于在分享日志时保护隐私，默认为空即不启用。例如 `1.2.*.*` `1234:5678::/32`，根据设置级别来控制IP隐藏程度",
+          "enum": ["quarter", "half", "full"],
+          "default": ""
+        }
+      },
+      "examples": [
+        {
+          "access": "文件地址",
+          "error": "文件地址",
+          "loglevel": "warning",
+          "dnsLog": false,
+          "maskAddress": ""
+        }
+      ]
+    },
+    "ApiObject": {
+      "title": "API 接口配置",
+      "description": "API 接口配置提供了一些基于 gRPC 的 API 接口供远程调用。",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "tag": {
+          "title": "出站代理标识",
+          "type": "string"
+        },
+        "listen": {
+          "title": "API 服务监听的 IP 和端口",
+          "description": "这是一个可选配置项。省略这项时需要按照相关配置 https://xtls.github.io/config/api.html#%E7%9B%B8%E5%85%B3%E9%85%8D%E7%BD%AE 配置 ，添加 inbounds 和 routing 配置。",
+          "type": "string",
+          "examples": ["127.0.0.1:8080"]
+        },
+        "services": {
+          "title": "支持的 API 列表",
+          "type": "array",
+          "items": {
+            "enum": [
+              "HandlerService",
+              "RoutingService",
+              "LoggerService",
+              "StatsService",
+              "ReflectionService"
+            ]
+          },
+          "examples": [
+            [
+              "HandlerService",
+              "RoutingService",
+              "LoggerService",
+              "StatsService",
+              "ReflectionService"
+            ]
+          ]
+        }
+      },
+      "examples": [
+        {
+          "tag": "api",
+          "listen": "127.0.0.1:8080",
+          "services": [
+            "HandlerService",
+            "RoutingService",
+            "LoggerService",
+            "StatsService",
+            "ReflectionService"
+          ]
+        }
+      ]
+    },
+    "DnsObject": {
+      "title": "DNS 配置",
+      "description": "内置的 DNS 服务器. 如果没有配置此项，则使用系统的 DNS 设置。",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "hosts": {
+          "title": "静态 IP 列表",
+          "type": "object",
+          "additionalProperties": {
+            "anyOf": [
+              { "type": "string", "format": "ipv4" },
+              { "type": "string", "format": "ipv6" },
+              { "type": "string", "format": "hostname" },
+              { "type": "string", "format": "idn-hostname" }
+            ]
+          },
+          "examples": [
+            {
+              "baidu.com": "127.0.0.1"
+            }
+          ]
+        },
+        "servers": {
+          "title": "DNS 服务器列表",
+          "description": "支持 DNS 地址 (字符串形式) 和 ServerObject 。",
+          "type": "array",
+          "items": {
+            "anyOf": [
+              { "$ref": "#/definitions/DnsAddress" },
+              { "$ref": "#/definitions/ServerObject" }
+            ]
+          }
+        },
+        "clientIp": {
+          "title": "客户端 IP",
+          "description": "用于 DNS 查询时通知服务器以指定 IP 位置。不能是私有地址。",
+          "anyOf": [
+            { "type": "string", "format": "ipv4" },
+            { "type": "string", "format": "ipv6" }
+          ],
+          "examples": ["1.2.3.4"]
+        },
+        "tag": {
+          "title": "DNS 代理标识",
+          "type": "string",
+          "examples": ["dns_inbound"]
+        }
+      },
+      "examples": [
+        {
+          "hosts": {
+            "baidu.com": "127.0.0.1"
+          },
+          "servers": [
+            "8.8.8.8",
+            "8.8.4.4",
+            {
+              "address": "1.2.3.4",
+              "port": 5353,
+              "domains": ["domain:xray.com"],
+              "expectIPs": ["geoip:cn"]
+            },
+            "localhost"
+          ],
+          "clientIp": "1.2.3.4",
+          "tag": "dns_inbound"
+        }
+      ]
+    },
+    "DnsAddress": {
+      "title": "DNS 服务器地址",
+      "anyOf": [
+        { "const": "localhost" },
+        { "const": "fakedns" },
+        { "type": "string", "format": "ipv4" },
+        { "type": "string", "format": "ipv6" },
+        { "type": "string", "format": "uri" },
+        { "type": "string", "format": "iri" }
+      ],
+      "examples": [
+        "8.8.8.8",
+        "https://dns.google/dns-query",
+        "https+local://dns.google/dns-query",
+        "localhost",
+        "fakedns"
+      ]
+    },
+    "ServerObject": {
+      "title": "DNS 服务器",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "address": {
+          "$ref": "#/definitions/DnsAddress"
+        },
+        "port": {
+          "title": "DNS 服务器端口"
+        },
+        "domains": {
+          "title": "域名匹配列表",
+          "description": "此列表包含的域名，将优先使用此服务器进行查询。",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "examples": ["domain:xray.com", "geosite:google", "geosite:cn"]
+        },
+        "expectIPs": {
+          "title": "IP 范围列表",
+          "description": "当配置此项时，Xray DNS 会对返回的 IP 的进行校验，只返回此列表中包含的地址。",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "examples": ["geoip:cn"]
+        },
+        "unexpectedIPs": {
+          "title": "expectedIPs 的反向版本",
+          "description": "去掉包含于这个列表的 IP。",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "examples": ["geoip:cloudflare"]
+        },
+        "skipFallback": {
+          "title": "DNS fallback 查询",
+          "description": "为 true 时，在进行 DNS fallback 查询时将跳过此服务器, 默认为 false，即不跳过。",
+          "type": "boolean",
+          "default": false
+        },
+        "timeoutMs": {
+          "title": "DNS 服务器超时时间",
+          "type": "null",
+          "default": "4000",
+          "examples": ["4000"]
+        }
+      },
+      "anyOf": [
+        {
+          "properties": {
+            "address": {
+              "anyOf": [{ "format": "ipv4" }, { "format": "ipv6" }]
+            },
+            "port": {
+              "type": "integer",
+              "default": 53,
+              "minimum": 1,
+              "maximum": 65535
+            }
+          }
+        },
+        {
+          "$comment": "该配置在 vscode 中暂时无效，详见 microsoft/vscode#123447 。",
+          "properties": {
+            "port": {
+              "description": "当使用 DOH 模式该项无效，非标端口应在 URL 中指定。",
+              "const": null
+            }
+          }
+        }
+      ],
+      "required": ["address"]
+    },
+    "RoutingObject": {
+      "title": "路由功能配置",
+      "description": "可以将入站数据按不同规则由不同的出站连接发出，以达到按需代理的目的。",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "domainStrategy": {
+          "title": "域名解析策略",
+          "description": "`AsIs`：不进行额外操作，使用目标地址里的域名或者 sniff 到的域名。默认值；\n`IPIfNonMatch`：一整轮匹配结束后，当没有命中任何规则时，将域名解析成 IP 再次进行二次匹配；\n`IPOnDemand`：在开始进行匹配前，直接先将域名解析为 IP 进行匹配；",
+          "enum": ["AsIs", "IPIfNonMatch", "IPOnDemand"],
+          "default": "AsIs"
+        },
+        "rules": {
+          "title": "规则列表",
+          "description": "对于每一个连接，路由将根据这些规则依次进行判断，当一个规则生效时，即将这个连接转发至它所指定的 outboundTag 或 balancerTag 。",
+          "type": "array",
+          "items": { "$ref": "#/definitions/RuleObject" },
+          "examples": [
+            [
+              {
+                "type": "field",
+                "domain": ["baidu.com", "qq.com", "geosite:cn"],
+                "ip": [
+                  "0.0.0.0/8",
+                  "10.0.0.0/8",
+                  "fc00::/7",
+                  "fe80::/10",
+                  "geoip:cn"
+                ],
+                "port": "53,443,1000-2000",
+                "sourcePort": "53,443,1000-2000",
+                "network": "tcp",
+                "source": ["10.0.0.1"],
+                "user": ["love@xray.com"],
+                "inboundTag": ["tag-vmess"],
+                "protocol": ["http", "tls", "bittorrent"],
+                "attrs": "attrs[':method'] == 'GET'",
+                "outboundTag": "direct",
+                "balancerTag": "balancer"
+              }
+            ]
+          ]
+        },
+        "balancers": {
+          "title": "负载均衡器列表",
+          "description": "当一个规则指向一个负载均衡器时，Xray 会通过此负载均衡器选出一个 outbound, 然后由它转发流量。",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/BalancerObject"
+          }
+        }
+      },
+      "examples": [
+        {
+          "domainStrategy": "AsIs",
+          "rules": [],
+          "balancers": []
+        }
+      ]
+    },
+    "RuleObject": {
+      "title": "路由规则",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "field",
+          "default": "field"
+        },
+        "domain": {
+          "title": "域名匹配列表",
+          "description": "当某一项匹配目标域名时，此规则生效。",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "ip": {
+          "title": "目标 IP 匹配列表",
+          "description": "当某一项匹配目标 IP 时，此规则生效。",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "port": {
+          "title": "目标端口",
+          "anyOf": [
+            { "type": "integer", "minimum": 1, "maximum": 65535 },
+            {
+              "type": "string",
+              "pattern": "^\\d+\\-\\d+$",
+              "$comment": "为了简化正则，此处不进行数值范围校验，下同"
+            },
+            {
+              "type": "string",
+              "pattern": "^(\\d+|\\d+\\-\\d+)(,(\\d+|\\d+\\-\\d+))*$"
+            }
+          ]
+        },
+        "sourcePort": {
+          "title": "来源端口",
+          "anyOf": [
+            { "type": "integer", "minimum": 1, "maximum": 65535 },
+            {
+              "type": "string",
+              "pattern": "^\\d+\\-\\d+$"
+            },
+            {
+              "type": "string",
+              "pattern": "^(\\d+|\\d+\\-\\d+)(,(\\d+|\\d+\\-\\d+))*$"
+            }
+          ]
+        },
+        "network": {
+          "title": "网络协议匹配",
+          "description": "当连接方式是指定的方式时，此规则生效。",
+          "enum": ["tcp", "udp", "tcp,udp"]
+        },
+        "source": {
+          "title": "来源 IP 匹配列表",
+          "description": "当某一项匹配来源 IP 时，此规则生效。",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "user": {
+          "title": "用户匹配列表",
+          "description": "当某一项匹配来源用户时，此规则生效。",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "inboundTag": {
+          "title": "入站标识匹配列表",
+          "description": "当某一项匹配入站协议的标识时，此规则生效。",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "protocol": {
+          "title": "应用协议匹配",
+          "description": "当某一个协议匹配当前连接的协议类型时，此规则生效。",
+          "type": "array",
+          "items": {
+            "enum": ["http", "tls", "quic", "bittorrent"]
+          }
+        },
+        "attrs": {
+          "title": "属性匹配列表",
+          "type": "string"
+        },
+        "outboundTag": {
+          "title": "指定出站连接的标识",
+          "description": "balancerTag 和 outboundTag 须二选一。",
+          "type": "string"
+        },
+        "balancerTag": {
+          "title": "指定负载均衡的标识",
+          "description": "balancerTag 和 outboundTag 须二选一。",
+          "type": "string"
+        }
+      },
+      "oneOf": [
+        {
+          "required": ["outboundTag"]
+        },
+        {
+          "required": ["balancerTag"]
+        }
+      ],
+      "required": ["type"],
+      "examples": [
+        {
+          "type": "field",
+          "domain": ["baidu.com", "qq.com", "geosite:cn"],
+          "ip": [
+            "0.0.0.0/8",
+            "10.0.0.0/8",
+            "fc00::/7",
+            "fe80::/10",
+            "geoip:cn"
+          ],
+          "port": "53,443,1000-2000",
+          "sourcePort": "53,443,1000-2000",
+          "network": "tcp",
+          "source": ["10.0.0.1"],
+          "user": ["love@xray.com"],
+          "inboundTag": ["tag-vmess"],
+          "protocol": ["http", "tls", "bittorrent"],
+          "attrs": "attrs[':method'] == 'GET'",
+          "outboundTag": "direct",
+          "balancerTag": "balancer"
+        }
+      ]
+    },
+    "BalancerObject": {
+      "title": "负载均衡器",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "tag": {
+          "title": "负载均衡器标识",
+          "description": "用于匹配 RuleObject 中的 balancerTag 。",
+          "type": "string"
+        },
+        "selector": {
+          "title": "匹配列表",
+          "description": "一个字符串数组，其中每一个字符串将用于和 outbound 标识的前缀匹配。",
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "examples": [
+        {
+          "tag": "balancer",
+          "selector": []
+        }
+      ]
+    },
+    "PolicyObject": {
+      "title": "本地策略配置",
+      "description": "可以设置不同的用户等级和对应的策略设置，比如连接超时设置。Xray 处理的每一个连接都对应一个用户，按照用户的等级（level）应用不同的策略。",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "levels": {
+          "title": "用户等级策略组",
+          "description": "一个键值对，每个键是一个字符串形式的数字，比如 \"0\"、\"1\" 等，双引号不能省略，此数字对应用户等级。",
+          "additionalProperties": {
+            "$ref": "#/definitions/LevelPolicyObject"
+          }
+        },
+        "system": {
+          "$ref": "#/definitions/SystemPolicyObject"
+        }
+      },
+      "examples": [
+        {
+          "levels": {
+            "0": {
+              "handshake": 4,
+              "connIdle": 300,
+              "uplinkOnly": 2,
+              "downlinkOnly": 5,
+              "statsUserUplink": false,
+              "statsUserDownlink": false,
+              "bufferSize": 4
+            }
+          },
+          "system": {
+            "statsInboundUplink": false,
+            "statsInboundDownlink": false,
+            "statsOutboundUplink": false,
+            "statsOutboundDownlink": false
+          }
+        }
+      ]
+    },
+    "LevelPolicyObject": {
+      "title": "用户等级策略",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "handshake": {
+          "title": "连接建立时的握手时间限制",
+          "description": "单位为秒。在入站代理处理一个新连接时，在握手阶段如果使用的时间超过这个时间，则中断该连接。",
+          "type": "integer",
+          "default": 4
+        },
+        "connIdle": {
+          "title": "连接空闲的时间限制",
+          "description": "单位为秒。inbound/outbound 处理一个连接时，如果在 connIdle 时间内，没有任何数据被传输（包括上行和下行数据），则中断该连接。",
+          "type": "integer",
+          "default": 300
+        },
+        "uplinkOnly": {
+          "title": "连接下行线路关闭后的时间限制",
+          "description": "单位为秒。当服务器（如远端网站）关闭下行连接时，出站代理会在等待 uplinkOnly 时间后中断连接。",
+          "type": "integer",
+          "default": 2
+        },
+        "downlinkOnly": {
+          "title": "连接上行线路关闭后的时间限制",
+          "description": "单位为秒。当客户端（如浏览器）关闭上行连接时，入站代理会在等待 downlinkOnly 时间后中断连接。",
+          "type": "integer",
+          "default": 5
+        },
+        "statsUserUplink": {
+          "title": "上行流量统计",
+          "description": "当值为 true 时，开启当前等级的所有用户的上行流量统计。",
+          "type": "boolean"
+        },
+        "statsUserDownlink": {
+          "title": "下行流量统计",
+          "description": "当值为 true 时，开启当前等级的所有用户的下行流量统计。",
+          "type": "boolean"
+        },
+        "bufferSize": {
+          "title": "每个连接的内部缓存大小",
+          "description": "单位为 kB。当值为 0 时，内部缓存被禁用。",
+          "type": "integer"
+        }
+      },
+      "examples": [
+        {
+          "handshake": 4,
+          "connIdle": 300,
+          "uplinkOnly": 2,
+          "downlinkOnly": 5,
+          "statsUserUplink": false,
+          "statsUserDownlink": false,
+          "bufferSize": 10240
+        }
+      ]
+    },
+    "SystemPolicyObject": {
+      "title": "系统级别策略",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "statsInboundUplink": {
+          "title": "入站代理上行流量统计",
+          "description": "当值为 true 时，开启所有入站代理的上行流量统计。",
+          "type": "boolean"
+        },
+        "statsInboundDownlink": {
+          "title": "入站代理下行流量统计",
+          "description": "当值为 true 时，开启所有入站代理的下行流量统计。",
+          "type": "boolean"
+        },
+        "statsOutboundUplink": {
+          "title": "出站代理上行流量统计",
+          "description": "当值为 true 时，开启所有出站代理的上行流量统计。",
+          "type": "boolean"
+        },
+        "statsOutboundDownlink": {
+          "title": "出站代理下行流量统计",
+          "description": "当值为 true 时，开启所有出站代理的下行流量统计。",
+          "type": "boolean"
+        }
+      },
+      "examples": [
+        {
+          "statsInboundUplink": false,
+          "statsInboundDownlink": false,
+          "statsOutboundUplink": false,
+          "statsOutboundDownlink": false
+        }
+      ]
+    },
+    "InboundObject": {
+      "title": "入站连接配置",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "listen": {
+          "title": "监听地址",
+          "description": "IP 地址或 Unix domain socket",
+          "type": "string",
+          "default": "0.0.0.0",
+          "examples": ["127.0.0.1", "/dev/shm/domain.socket"]
+        },
+        "port": {
+          "title": "监听端口",
+          "description": "当只有一个端口时，Xray 会在此端口监听入站连接。当指定了一个端口范围时，取决于 allocate 设置。",
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 65535
+            },
+            {
+              "type": "string",
+              "oneOf": [
+                { "pattern": "^env:.+" },
+                { "pattern": "^\\d+$" },
+                { "pattern": "^\\d+\\-\\d+?$" }
+              ]
+            }
+          ]
+        },
+        "protocol": {
+          "title": "连接协议",
+          "enum": [
+            "dokodemo-door",
+            "http",
+            "shadowsocks",
+            "socks",
+            "vless",
+            "vmess",
+            "trojan",
+            "wireguard",
+            "tun"
+          ]
+        },
+        "settings": {
+          "title": "连接协议（protocol）的具体配置",
+          "type": "object"
+        },
+        "streamSettings": {
+          "title": "底层传输方式（transport）",
+          "description": "Xray 节点和其它节点对接的方式",
+          "$ref": "#/definitions/StreamSettingsObject"
+        },
+        "tag": {
+          "title": "入站连接的标识",
+          "description": "用于在其它的配置中定位此连接。当其不为空时，其值必须在所有 tag 中唯一。",
+          "type": "string"
+        },
+        "sniffing": {
+          "title": "流量探测",
+          "description": "主要作用于在透明代理等用途",
+          "$ref": "#/definitions/SniffingObject"
+        },
+        "allocate": {
+          "$ref": "#/definitions/Allocate"
+        }
+      },
+      "required": ["protocol"],
+      "oneOf": [
+        {
+          "properties": {
+            "protocol": {
+              "const": "dokodemo-door"
+            },
+            "settings": {
+              "$ref": "#/definitions/DokodemoDoorInboundConfigurationObject"
+            }
+          }
+        },
+        {
+          "properties": {
+            "protocol": {
+              "const": "http"
+            },
+            "settings": {
+              "$ref": "#/definitions/HttpInboundConfigurationObject"
+            }
+          }
+        },
+        {
+          "properties": {
+            "protocol": {
+              "const": "shadowsocks"
+            },
+            "settings": {
+              "$ref": "#/definitions/ShadowsocksInboundConfigurationObject"
+            }
+          }
+        },
+        {
+          "properties": {
+            "protocol": {
+              "const": "socks"
+            },
+            "settings": {
+              "$ref": "#/definitions/SocksInboundConfigurationObject"
+            }
+          }
+        },
+        {
+          "properties": {
+            "protocol": {
+              "const": "trojan"
+            },
+            "settings": {
+              "$ref": "#/definitions/TrojanInboundConfigurationObject"
+            }
+          }
+        },
+        {
+          "properties": {
+            "protocol": {
+              "const": "vless"
+            },
+            "settings": {
+              "$ref": "#/definitions/VLESSInboundConfigurationObject"
+            }
+          },
+          "required": ["settings"]
+        },
+        {
+          "properties": {
+            "protocol": {
+              "const": "vmess"
+            },
+            "settings": {
+              "$ref": "#/definitions/VMessInboundConfigurationObject"
+            }
+          }
+        },
+        {
+          "properties": {
+            "protocol": {
+              "const": "wireguard"
+            },
+            "settings": {
+              "$ref": "#/definitions/WireguardInboundConfigurationObject"
+            }
+          }
+        },
+        {
+          "properties": {
+            "protocol": {
+              "const": "tun"
+            },
+            "settings": {
+              "$ref": "#/definitions/TUNInboundConfigurationObject"
+            }
+          }
+        }
+      ]
+    },
+    "DokodemoDoorInboundConfigurationObject": {
+      "title": "Tunnel（隧道），旧称任意门入站配置",
+      "description": "可以监听数个本地端口，并把所有收到的数据通过 outbound 发送至指定服务器的某个端口，从而达到端口映射的效果。",
+      "additionalProperties": false,
+      "properties": {
+        "address": {
+          "title": "转发目标地址",
+          "description": "当 followRedirect 为 true 时，address 可为空。",
+          "type": "string",
+          "anyOf": [
+            { "type": "string", "format": "ipv4" },
+            { "type": "string", "format": "ipv6" },
+            { "type": "string", "format": "hostname" },
+            { "type": "string", "format": "idn-hostname" }
+          ]
+        },
+        "port": {
+          "title": "转发目标端口",
+          "description": "将流量转发到目标地址的指定端口，范围 [0, 65535]，数值类型。不填或者为 0 时默认为监听端口",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65535
+        },
+        "portMap": {
+          "description": "映射本地端口和需要的远程地址/端口(如果 inbound 监听了数个端口), 如果本地端口未包含在其中则按 address/port 设置处理",
+          "type": "object",
+          "examples": [
+            {
+              "5555": "1.1.1.1:7777",
+              "5556": ":8888",
+              "5557": "example.com:"
+            }
+          ]
+        },
+        "network": {
+          "title": "可接收的网络协议类型",
+          "description": "默认值为 `tcp`",
+          "enum": ["tcp", "udp", "tcp,udp"],
+          "default": "tcp"
+        },
+        "timeout": {
+          "title": "连接空闲的时间限制",
+          "description": "单位为秒",
+          "type": "integer",
+          "default": 300,
+          "deprecated": true
+        },
+        "followRedirect": {
+          "description": "当值为 true 时，dokodemo-door 会识别出由 iptables 转发而来的数据，并转发到相应的目标地址。",
+          "type": "boolean",
+          "default": false
+        },
+        "userLevel": {
+          "title": "用户等级",
+          "description": "连接会使用这个用户等级对应的本地策略。",
+          "type": "integer",
+          "default": 0
+        }
+      },
+      "required": ["port"],
+      "anyOf": [
+        {
+          "properties": {
+            "followRedirect": {
+              "const": true
+            }
+          }
+        },
+        { "required": ["address"] }
+      ]
+    },
+    "HttpInboundConfigurationObject": {
+      "title": "HTTP 入站配置",
+      "description": "HTTP 入站通常用于在局域网或本机环境下监听，为其他程序提供本地服务。",
+      "additionalProperties": false,
+      "properties": {
+        "timeout": {
+          "title": "连接空闲的时间限制",
+          "description": "单位为秒",
+          "type": "integer",
+          "default": 300,
+          "deprecated": true
+        },
+        "accounts": {
+          "title": "用户帐号列表",
+          "description": "当 accounts 非空时，HTTP 代理将对入站连接进行 Basic Authentication 验证。",
+          "type": "array",
+          "items": { "$ref": "#/definitions/AccountObject" },
+          "default": []
+        },
+        "allowTransparent": {
+          "title": "允许透明代理",
+          "description": "当为 true 时，会转发所有 HTTP 请求，而非只是代理请求。",
+          "type": "boolean",
+          "default": false
+        },
+        "userLevel": {
+          "title": "用户等级",
+          "description": "连接会使用这个用户等级对应的本地策略。",
+          "type": "integer",
+          "default": 0
+        }
+      }
+    },
+    "AccountObject": {
+      "title": "用户配置",
+      "additionalProperties": false,
+      "properties": {
+        "user": {
+          "title": "用户名",
+          "type": "string"
+        },
+        "pass": {
+          "title": "密码",
+          "type": "string"
+        }
+      },
+      "required": ["user", "pass"]
+    },
+    "ShadowsocksInboundConfigurationObject": {
+      "title": "Shadowsocks 入站配置",
+      "description": "兼容大部分其它版本的实现",
+      "additionalProperties": false,
+      "properties": {
+        "network": {
+          "title": "服务端端口监听的网络类型",
+          "description": "默认值为 `tcp`",
+          "enum": ["tcp", "udp", "tcp,udp"],
+          "default": "tcp"
+        },
+        "method": {
+          "title": "加密方式",
+          "type": "string",
+          "examples": [
+            "2022-blake3-aes-128-gcm",
+            "2022-blake3-aes-256-gcm",
+            "2022-blake3-chacha20-poly1305",
+            "aes-256-gcm",
+            "aes-128-gcm",
+            "chacha20-poly1305",
+            "chacha20-ietf-poly1305",
+            "xchacha20-poly1305",
+            "xchacha20-ietf-poly1305",
+            "none",
+            "plain"
+          ]
+        },
+        "password": {
+          "description": "密码字段。必填",
+          "type": "string",
+          "examples": ["114514"]
+        },
+        "level": {
+          "title": "用户等级",
+          "description": "连接会使用这个用户等级对应的 本地策略。",
+          "type": "integer",
+          "default": 0
+        },
+        "email": {
+          "title": "用户邮箱",
+          "description": "用于区分不同用户的流量（日志、统计）",
+          "type": "string",
+          "examples": ["love@xray.com"]
+        },
+        "clients": {
+          "title": "用户列表",
+          "description": "当存在此选项时，代表启用多用户模式",
+          "type": "array",
+          "items": { "$ref": "#/definitions/ShadowsocksClientObject" },
+          "default": []
+        }
+      },
+      "required": ["password"]
+    },
+    "ShadowsocksClientObject": {
+      "title": "用户配置",
+      "additionalProperties": false,
+      "properties": {
+        "password": {
+          "description": "密码字段。必填",
+          "type": "string",
+          "examples": ["114514"]
+        },
+        "method": {
+          "title": "加密方式",
+          "type": "string",
+          "examples": [
+            "2022-blake3-aes-128-gcm",
+            "2022-blake3-aes-256-gcm",
+            "2022-blake3-chacha20-poly1305",
+            "aes-256-gcm",
+            "aes-128-gcm",
+            "chacha20-poly1305",
+            "chacha20-ietf-poly1305",
+            "xchacha20-poly1305",
+            "xchacha20-ietf-poly1305",
+            "none",
+            "plain"
+          ]
+        },
+        "level": {
+          "title": "用户等级",
+          "description": "连接会使用这个用户等级对应的 本地策略。",
+          "type": "integer",
+          "default": 0
+        },
+        "email": {
+          "title": "用户邮箱",
+          "description": "用于区分不同用户的流量（日志、统计）",
+          "type": "string",
+          "examples": ["love@xray.com"]
+        }
+      },
+      "required": ["password"]
+    },
+    "SocksInboundConfigurationObject": {
+      "title": "Socks 入站配置",
+      "description": "标准 Socks 协议实现，兼容 Socks 4、Socks 4a 和 Socks 5。\nSocks 入站通常用于在局域网或本机环境下监听，为其他程序提供本地服务。",
+      "additionalProperties": false,
+      "properties": {
+        "auth": {
+          "title": "认证方式",
+          "enum": ["noauth", "password"],
+          "default": "noauth"
+        },
+        "accounts": {
+          "title": "用户账号列表"
+        },
+        "udp": {
+          "title": "UDP协议支持",
+          "type": "boolean",
+          "default": false
+        },
+        "ip": {
+          "title": "本机的 IP 地址"
+        },
+        "level": {
+          "title": "用户等级",
+          "description": "连接会使用这个用户等级对应的 本地策略。",
+          "type": "integer",
+          "default": 0
+        }
+      },
+      "anyOf": [
+        {
+          "properties": {
+            "auth": {
+              "const": "password"
+            },
+            "accounts": {
+              "type": "array",
+              "items": { "$ref": "#/definitions/AccountObject" },
+              "default": []
+            }
+          },
+          "required": ["accounts"]
+        },
+        {
+          "properties": {
+            "auth": {
+              "const": "noauth"
+            },
+            "accounts": {
+              "description": "此选项仅当 auth 为 password 时有效。",
+              "const": null
+            }
+          }
+        },
+        {
+          "properties": {
+            "udp": {
+              "const": true
+            },
+            "ip": {
+              "description": "当开启 UDP 时，Xray 需要知道本机的 IP 地址。",
+              "anyOf": [{ "format": "ipv4" }, { "format": "ipv6" }]
+            }
+          }
+        }
+      ]
+    },
+    "TrojanInboundConfigurationObject": {
+      "title": "Trojan 入站配置",
+      "additionalProperties": false,
+      "properties": {
+        "clients": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/TrojanClientObject" }
+        },
+        "fallbacks": {
+          "description": "包含一系列强大的回落分流配置（可选）",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FallbackObject"
+          }
+        }
+      }
+    },
+    "TrojanClientObject": {
+      "title": "用户配置",
+      "additionalProperties": false,
+      "properties": {
+        "password": {
+          "description": "密码字段。必填",
+          "type": "string",
+          "examples": ["114514"]
+        },
+        "email": {
+          "title": "用户邮箱",
+          "description": "用于标识用户",
+          "type": "string",
+          "examples": ["love@xray.com"]
+        },
+        "level": {
+          "title": "用户等级",
+          "description": "连接会使用这个用户等级对应的 本地策略。",
+          "type": "integer",
+          "default": 0
+        }
+      },
+      "required": ["password"]
+    },
+    "VLESSInboundConfigurationObject": {
+      "title": "VLESS 入站配置",
+      "description": "一个无状态的轻量传输协议，可以作为 Xray 客户端和服务器之间的桥梁。\n目前 VLESS 没有自带加密，请用于可靠信道，如 TLS。 目前 VLESS 不支持分享。",
+      "properties": {
+        "clients": {
+          "title": "用户列表",
+          "description": "代表一组服务端认可的用户。",
+          "type": "array",
+          "items": { "$ref": "#/definitions/VLESSClientObject" },
+          "default": []
+        },
+        "decryption": {
+          "title": "VLESS 加密设置",
+          "description": "不能留空，禁用需显式设置为 `none`",
+          "anyOf": [
+            { "const": "none" },
+            {
+              "type": "string"
+            }
+          ]
+        },
+        "fallbacks": {
+          "title": "回落分流配置",
+          "description": "包含一系列强大的回落分流配置（可选）。",
+          "type": "array",
+          "items": { "$ref": "#/definitions/FallbackObject" }
+        }
+      },
+      "required": ["decryption"]
+    },
+    "VLESSClientObject": {
+      "title": "VLESS 用户配置",
+      "properties": {
+        "id": {
+          "title": "VLESS 的用户 ID",
+          "description": "可以是任意小于 30 字节的字符串，也可以是一个合法的 UUID 。\n自定义字符串和其映射的 UUID 是等价的，你可以使用命令 xray uuid -i \"自定义字符串\" 生成自定义字符串所映射的的 UUID。",
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 30
+            },
+            {
+              "type": "string",
+              "minLength": 36,
+              "maxLength": 36
+            }
+          ]
+        },
+        "level": {
+          "title": "用户等级",
+          "description": "连接会使用这个用户等级对应的本地策略。",
+          "type": "integer",
+          "default": 0
+        },
+        "email": {
+          "title": "用户邮箱",
+          "description": "用于区分不同用户的流量（会体现在日志、统计中）。",
+          "type": "string",
+          "format": "email"
+        },
+        "flow": {
+          "title": "流控模式",
+          "type": "string",
+          "enum": ["xtls-rprx-vision"]
+        },
+        "reverse": {
+          "$ref": "#/definitions/VLESSReverse"
+        }
+      },
+      "required": ["id"]
+    },
+    "VLESSReverse": {
+      "title": "VLESS 极简反向代理配置",
+      "description": "和核心内部自带的的通用反向代理作用相同但是配置更简单",
+      "properties": {
+        "tag": {
+          "description": "tag 为该反向代理的出站代理 tag. 使用路由将流量路由到该出站将会透过反向代理转发到连入的客户端路由系统中",
+          "type": "string"
+        }
+      }
+    },
+    "VMessInboundConfigurationObject": {
+      "title": "VMess 入站配置",
+      "description": "一个加密传输协议，可以作为 Xray 客户端和服务器之间的桥梁。",
+      "properties": {
+        "clients": {
+          "title": "用户列表",
+          "type": "array",
+          "items": { "$ref": "#/definitions/VMessClientObject" }
+        },
+        "detour": {
+          "title": "绕路配置",
+          "description": "指示对应的出站协议使用另一个服务器。",
+          "type": "object",
+          "properties": {
+            "to": {
+              "title": "入站 tag",
+              "description": "一个 inbound 的 tag , 指定的 inbound 必须使用 VMess 协议。",
+              "type": "string"
+            }
+          },
+          "required": ["to"],
+          "examples": [
+            {
+              "to": "tag_to_detour"
+            }
+          ]
+        },
+        "default": {
+          "title": "clients 的默认配置",
+          "description": "仅在配合 detour 时有效"
+        },
+        "disableInsecureEncryption": {
+          "title": "禁用不安全的加密",
+          "description": "如果设置为 true 当客户端指定下列加密方式时，服务器会主动断开连接。\n\"none\"\n\"aes-128-cfb\"",
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "anyOf": [
+        {
+          "properties": {
+            "default": {
+              "type": "object",
+              "properties": {
+                "level": {
+                  "title": "用户等级",
+                  "description": "连接会使用这个用户等级对应的本地策略。",
+                  "type": "integer",
+                  "default": 0
+                },
+                "alterId": {
+                  "title": "动态 ID",
+                  "description": "为了进一步防止被探测，一个用户可以在主 ID 的基础上，再额外生成多个动态 ID 。这里只需要指定动态 ID 的数量，推荐值为 0 代表启用 VMessAEAD 。",
+                  "type": "integer",
+                  "default": 0,
+                  "minimum": 0,
+                  "maximum": 65535
+                }
+              }
+            }
+          },
+          "required": ["detour", "default"]
+        },
+        {
+          "properties": {
+            "default": {
+              "const": null
+            }
+          }
+        }
+      ]
+    },
+    "VMessClientObject": {
+      "title": "VMess 用户配置",
+      "properties": {
+        "id": {
+          "title": "用户 ID",
+          "description": "可以是任意小于 30 字节的字符串，也可以是一个合法的 UUID 。\n自定义字符串和其映射的 UUID 是等价的，你可以使用命令 xray uuid -i \"自定义字符串\" 生成自定义字符串所映射的的 UUID。",
+          "type": "string",
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 30
+            },
+            {
+              "type": "string",
+              "minLength": 36,
+              "maxLength": 36
+            }
+          ]
+        },
+        "level": {
+          "title": "用户等级",
+          "description": "连接会使用这个用户等级对应的本地策略。",
+          "type": "integer",
+          "default": 0
+        },
+        "alterId": {
+          "title": "动态 ID",
+          "description": "为了进一步防止被探测，一个用户可以在主 ID 的基础上，再额外生成多个动态 ID 。这里只需要指定动态 ID 的数量，推荐值为 0 代表启用 VMessAEAD 。",
+          "type": "integer",
+          "default": 0,
+          "minimum": 0,
+          "maximum": 65535
+        },
+        "email": {
+          "title": "用户邮箱",
+          "description": "用于区分不同用户的流量（会体现在日志、统计中）。",
+          "type": "string",
+          "format": "email"
+        }
+      }
+    },
+    "WireguardInboundConfigurationObject": {
+      "title": "Wireguard 配置",
+      "properties": {
+        "secretKey": {
+          "title": "私钥",
+          "type": "string"
+        },
+        "peer": {
+          "type": "object",
+          "properties": {
+            "publicKey": {
+              "title": "公钥",
+              "type": "string"
+            },
+            "allowedIPs": {
+              "title": "允许的源IP",
+              "type": "array",
+              "items": { "type": "array" }
+            }
+          }
+        },
+        "mtu": {
+          "description": "Wireguard 底层 tun 的分片大小",
+          "type": "integer",
+          "default": 1420
+        }
+      },
+      "required": ["secretKey"]
+    },
+    "TUNInboundConfigurationObject": {
+      "description": "创建一个 TUN 接口，发往此接口的流量将由 Xray 处理。目前仅支持 Windows 与 Linux.",
+      "properties": {
+        "name": {
+          "title": "创建的 TUN 接口名",
+          "type": "string",
+          "default": "xray0"
+        },
+        "MTU": {
+          "type": "integer",
+          "default": 1500
+        },
+        "level": {
+          "title": "用户等级",
+          "description": "连接会使用这个用户等级对应的本地策略。",
+          "type": "integer",
+          "default": 0
+        }
+      }
+    },
+    "OutboundObject": {
+      "title": "出站连接配置",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "sendThrough": {
+          "description": "用于发送数据的 IP 地址，当主机有多个 IP 地址时有效，默认值为 `0.0.0.0`",
+          "type": "string"
+        },
+        "protocol": {
+          "title": "出站协议",
+          "type": "string",
+          "enum": [
+            "blackhole",
+            "dns",
+            "freedom",
+            "http",
+            "loopback",
+            "shadowsocks",
+            "socks",
+            "trojan",
+            "vless",
+            "vmess",
+            "wireguard"
+          ]
+        },
+        "settings": {
+          "description": "出站协议配置"
+        },
+        "tag": {
+          "title": "出站连接的标识",
+          "description": "用于在其它的配置中定位此连接",
+          "type": "string"
+        },
+        "streamSettings": {
+          "$ref": "#/definitions/StreamSettingsObject"
+        },
+        "proxySettings": {
+          "$ref": "#/definitions/ProxySettings"
+        },
+        "mux": {
+          "$ref": "#/definitions/MuxObject"
+        }
+      },
+      "required": ["protocol", "tag"],
+      "oneOf": [
+        {
+          "properties": {
+            "protocol": {
+              "const": "blackhole"
+            },
+            "settings": {
+              "$ref": "#/definitions/BlackholeOutboundConfigurationObject"
+            }
+          }
+        },
+        {
+          "properties": {
+            "protocol": {
+              "const": "freedom"
+            },
+            "settings": {
+              "$ref": "#/definitions/MapObject"
+            }
+          }
+        },
+        {
+          "properties": {
+            "protocol": {
+              "const": "dns"
+            },
+            "settings": {
+              "$ref": "#/definitions/MapObject"
+            }
+          }
+        },
+        {
+          "properties": {
+            "protocol": {
+              "const": "http"
+            },
+            "settings": {
+              "$ref": "#/definitions/MapObject"
+            }
+          }
+        },
+        {
+          "properties": {
+            "protocol": {
+              "const": "loopback"
+            },
+            "settings": {
+              "$ref": "#/definitions/MapObject"
+            }
+          }
+        }
+      ]
+    },
+    "BlackholeOutboundConfigurationObject": {
+      "properties": {
+        "response": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "description": "Blackhole 返回类型。`none` 将直接关闭连接；`http` 会发回一个简单的 HTTP 403 数据包，然后关闭连接",
+              "type": "string",
+              "enum": ["http", "none"]
+            }
+          }
+        }
+      }
+    },
+    "FakeDnsObject": {
+      "title": "伪造 DNS 配置",
+      "description": "FakeDNS 通过伪造 DNS 以获取目标域名，能够降低 DNS 查询时的延迟、配合透明代理获取目标域名。",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ipPool": {
+          "title": "IP 池",
+          "description": "FakeDNS 将使用此选项指定的 IP 块分配地址。",
+          "type": "string"
+        },
+        "poolSize": {
+          "title": "IP 池容量",
+          "description": "指定 FakeDNS 储存的 域名-IP 映射的最大数目。当映射数超过此值后，会按照 LRU 规则淘汰映射。",
+          "type": "integer",
+          "default": 65535
+        }
+      },
+      "required": ["ipPool"]
+    },
+    "Allocate": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "strategy": {
+          "type": "string"
+        },
+        "refresh": {
+          "type": "integer"
+        },
+        "concurrency": {
+          "type": "integer"
+        }
+      },
+      "required": ["concurrency", "refresh", "strategy"],
+      "title": "Allocate"
+    },
+    "StatsObject": {
+      "type": "object",
+      "additionalProperties": false,
+      "title": "Stats"
+    },
+    "SniffingObject": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "title": "是否开启流量探测",
+          "type": "boolean"
+        },
+        "destOverride": {
+          "description": "当流量为指定类型时，按其中包括的目标地址重置当前连接的目标。",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["http", "tls", "quic", "fakedns"]
+          },
+          "examples": ["http", "tls", "quic", "fakedns"]
+        },
+        "metadataOnly": {
+          "description": "当启用时，将仅使用连接的元数据嗅探目标地址。此时，除 fakedns 以外的 sniffer 将不能激活。如果关闭仅使用元数据推断目标地址，此时客户端必须先发送数据，代理服务器才会实际建立连接。此行为与需要服务器首先发起第一个消息的协议不兼容，如 SMTP 协议。",
+          "type": "boolean"
+        },
+        "domainsExcluded": {
+          "title": "域名列表",
+          "description": "如果流量探测结果在这个列表中时，将 不会 重置目标地址。支持直接的域名（精确匹配），或 regexp: 开头后接正则表达式。",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "examples": ["courier.push.apple.com", "Mijia Cloud", "dlg.io.mi.com"]
+        },
+        "routeOnly": {
+          "description": "需要开启 destOverride 使用。将嗅探得到的域名仅用于路由，代理目标地址仍为 IP。默认值为 false。",
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "required": ["destOverride", "enabled"],
+      "title": "Sniffing"
+    },
+    "ProxySettings": {
+      "title": "ProxySettings",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "tag": {
+          "description": "当指定另一个 outbound 的标识时，此 outbound 发出的数据，将被转发至所指定的 outbound 发出",
+          "type": "string"
+        },
+        "transportLayer": {
+          "description": "true 将此设置转化为 SockOpt.dialerProxy 来支持底层传输方式的转发，默认为 false 即不转化。",
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "MuxObject": {
+      "properties": {
+        "enabled": {
+          "description": "是否启用 Mux 转发请求",
+          "type": "boolean",
+          "default": false
+        },
+        "concurrency": {
+          "title": "最大并发连接数",
+          "description": "表示了一个 TCP 连接上最多承载的子连接数量",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 128
+        },
+        "xudpConcurrency": {
+          "description": "使用新 XUDP 聚合隧道（也就是另一条 Mux 连接）代理 UDP 流量，填写最大并发子 UoT 数量。",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1024
+        },
+        "xudpProxyUDP443": {
+          "type": "string",
+          "enum": ["reject", "allow", "skip"],
+          "default": "reject"
+        }
+      }
+    },
+    "ReverseObject": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "bridges": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Bridge"
+          }
+        },
+        "portals": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Bridge"
+          }
+        }
+      },
+      "required": ["bridges", "portals"],
+      "title": "Reverse"
+    },
+    "Bridge": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "tag": {
+          "type": "string"
+        },
+        "domain": {
+          "type": "string"
+        }
+      },
+      "required": ["domain", "tag"],
+      "title": "Bridge"
+    },
+    "StreamSettingsObject": {
+      "title": "Transport/StreamSettings",
+      "description": "传输方式（transport）是当前 Xray 节点和其它节点对接的方式",
+      "additionalProperties": false,
+      "properties": {
+        "network": {
+          "description": "连接的数据流所使用的传输方式类型。TCP 传输方式名为 RAW",
+          "type": "string",
+          "enum": [
+            "raw",
+            "xhttp",
+            "kcp",
+            "grpc",
+            "ws",
+            "httpupgrade",
+            "hysteria"
+          ],
+          "default": "raw"
+        },
+        "security": {
+          "description": "是否启用传输层加密",
+          "type": "string",
+          "enum": ["none", "tls", "reality"],
+          "default": "none"
+        },
+        "tlsSettings": {
+          "description": "TLS 配置。TLS 由 Golang 提供，通常情况下 TLS 协商的结果为使用 TLS 1.3，不支持 DTLS"
+        },
+        "realitySettings": {
+          "description": "Reality 配置。Reality 是 Xray 的原创黑科技。 Reality 比 TLS 的安全性更高, 配置方式也和 TLS 一致."
+        },
+        "rawSettings": {
+          "description": "当前连接的 RAW 配置，仅当此连接使用 RAW 时有效"
+        },
+        "xhttpSettings": {
+          "description": "当前连接的 XHTTP 配置，仅当此连接使用 XHTTP 时有效。"
+        },
+        "kcpSettings": {
+          "description": "当前连接的 mKCP 配置，仅当此连接使用 mKCP 时有效"
+        },
+        "grpcSettings": {
+          "description": "当前连接的 gRPC 配置，仅当此连接使用 gRPC 时有效"
+        },
+        "wsSettings": {
+          "description": "当前连接的 WebSocket 配置，仅当此连接使用 WebSocket 时有效"
+        },
+        "httpupgradeSettings": {
+          "description": "当前连接的 HTTPUpgrade 配置，仅当此连接使用 HTTPUpgrade 时有效"
+        },
+        "hysteriaSettings": {
+          "description": "当前连接的 Hysteria 配置，仅当此连接使用 Hysteria 时有效"
+        },
+        "sockopt": {
+          "description": "透明代理相关的具体配置"
+        },
+        "finalmask": {
+          "description": "FinalMask 配置，用于对流量进行通用伪装"
+        }
+      },
+      "allOf": [
+        {
+          "oneOf": [
+            {
+              "properties": {
+                "security": {
+                  "const": "none"
+                }
+              }
+            },
+            {
+              "properties": {
+                "security": {
+                  "const": "tls"
+                },
+                "tlsSettings": {}
+              },
+              "required": ["tlsSettings"]
+            },
+            {
+              "properties": {
+                "security": {
+                  "const": "reality"
+                },
+                "realitySettings": {
+                  "$ref": "#/definitions/RealityObject"
+                }
+              },
+              "required": ["realitySettings"]
+            }
+          ]
+        },
+        {
+          "oneOf": [
+            {
+              "properties": {
+                "network": {
+                  "const": "raw"
+                },
+                "rawSettings": {
+                  "$ref": "#/definitions/RawObject"
+                }
+              },
+              "required": ["rawSettings"]
+            },
+            {
+              "properties": {
+                "network": {
+                  "const": "xhttp"
+                },
+                "xhttpSettings": {
+                  "$ref": "#/definitions/XHttpObject"
+                }
+              },
+              "required": ["xhttpSettings"]
+            },
+            {
+              "properties": {
+                "network": {
+                  "const": "kcp"
+                },
+                "kcpSettings": {
+                  "$ref": "#/definitions/KcpObject"
+                }
+              },
+
+              "required": ["kcpSettings"]
+            },
+            {
+              "properties": {
+                "network": {
+                  "const": "grpc"
+                },
+                "grpcSettings": {
+                  "$ref": "#/definitions/GRPCObject"
+                }
+              },
+              "required": ["grpcSettings"]
+            },
+            {
+              "properties": {
+                "network": {
+                  "const": "ws"
+                },
+                "wsSettings": {
+                  "$ref": "#/definitions/WebSocketObject"
+                }
+              },
+              "required": ["wsSettings"]
+            },
+            {
+              "properties": {
+                "network": {
+                  "const": "httpupgrade"
+                },
+                "httpupgradeSettings": {
+                  "$ref": "#/definitions/HttpUpgradeObject"
+                }
+              },
+              "required": ["httpupgradeSettings"]
+            },
+            {
+              "properties": {
+                "network": {
+                  "const": "hysteria"
+                },
+                "hysteriaSettings": {
+                  "$ref": "#/definitions/HysteriaObject"
+                }
+              },
+              "required": ["hysteriaSettings"]
+            }
+          ]
+        }
+      ]
+    },
+    "TLSObject": {},
+    "RealityObject": {
+      "description": "",
+      "properties": {
+        "show": {
+          "description": "当值为 true 时，输出调试信息",
+          "type": "boolean"
+        },
+        "target": {
+          "title": "伪装的目标网站",
+          "description": "TLS协商时的伪装网站地址",
+          "type": "string"
+        },
+        "xver": {
+          "title": "PROXY protocol 版本",
+          "description": "专用于传递请求的真实来源 IP 和端口，填版本 1 或 2，默认为 0，即不发送。",
+          "enum": [0, 1, 2],
+          "default": 0
+        },
+        "serverNames": {
+          "description": "客户端可用的 serverName 列表，不支持 * 通配符",
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "privateKey": {
+          "description": "必填，执行 ./xray x25519 生成",
+          "type": "string"
+        },
+        "minClientVer": {
+          "description": "客户端 Xray 最低版本，格式为 x.y.z",
+          "type": "string"
+        },
+        "maxClientVer": {
+          "description": "客户端 Xray 最高版本，格式为 x.y.z",
+          "type": "string"
+        },
+        "maxTimeDiff": {
+          "description": "选填，允许的最大时间差，单位为毫秒",
+          "type": "integer",
+          "minimum": 0
+        },
+        "shortIds": {
+          "description": "客户端可用的 shortId 列表，可用于区分不同的客户端",
+          "type": "array",
+          "items": {
+            "description": "长度为 8 个字节，即 16 个 0~f 的数字字母，可以小于16个，核心将会自动在后面补0, 但位数必须是偶数 (因为一个字节有2位16进制数)",
+            "type": "string",
+            "minLength": 0,
+            "maxLength": 16,
+            "allOf": [
+              {
+                "description": "位数必须为偶数",
+                "pattern": "^(.{2})*$"
+              }
+            ]
+          }
+        },
+        "mldsa65Seed": {
+          "description": "仅服务端，为发送给 Reality 客户端的证书添加额外的后量子签名所使用的私钥，使用 ML-DSA-65 (如果存在可以破解 x25519 的量子计算机，password 泄露可能导致连接可以被 mitm, 该功能可以防止未来的这种攻击)\n 使用 xray mldsa65 生成使用的公私钥对，服务端配置私钥后只会在证书扩展中添加，不影响旧版客户端或没启用该功能的客户端。",
+          "type": "string"
+        }
+      },
+      "required": ["target", "serverNames", "privateKey", "shortIds"]
+    },
+    "RawObject": {
+      "description": "更名自曾经的 TCP 传输层（原名称有歧义），出站 RAW 传输层直接发送经代理协议包装后产生的 TCP、UDP 数据，核心不使用其它传输层（如 XHTTP）承载其流量。\n可以和各种协议有多种组合模式。",
+      "properties": {
+        "acceptProxyProtocol": {
+          "description": "仅用于 inbound，指示是否接收 PROXY protocol",
+          "type": "boolean",
+          "default": false
+        },
+        "header": {
+          "description": "数据包头部伪装设置，默认值为 NoneHeaderObject"
+        }
+      }
+    },
+    "XHttpObject": {
+      "description": "基于“分包上行、流式下行”原理实现",
+      "properties": {
+        "host": {
+          "description": "XHttp 的HTTP请求中所发送的host，默认值为空。若服务端值为空时，不验证客户端发送来的host值",
+          "type": "string"
+        },
+        "path": {
+          "description": "XHttp 所使用的 HTTP 协议路径，默认值为 `/`",
+          "type": "string",
+          "pattern": "^/"
+        },
+        "mode": {
+          "description": "XHttp 模式",
+          "type": "string",
+          "enum": ["auto", "stream-one", "stream-up"],
+          "default": "auto"
+        },
+        "extra": {
+          "description": "额外信息"
+        }
+      }
+    },
+    "KcpObject": {
+      "description": "mKCP 使用 UDP 来模拟 TCP 连接。\nmKCP 牺牲带宽来降低延迟。传输同样的内容，mKCP 一般比 TCP 消耗更多的流量。",
+      "additionalProperties": false,
+      "properties": {
+        "mtu": {
+          "title": "最大传输单元",
+          "type": "integer",
+          "minimum": 576,
+          "maximum": 1460,
+          "default": 1350
+        },
+        "tti": {
+          "title": "传输时间间隔",
+          "type": "integer",
+          "minimum": 10,
+          "maximum": 100,
+          "default": 50
+        },
+        "downlinkCapacity": {
+          "title": "下行链路容量",
+          "description": "主机接收数据所用的最大带宽，单位 MB/s",
+          "type": "number",
+          "minimum": 0,
+          "default": 20
+        },
+        "congestion": {
+          "title": "拥塞控制",
+          "description": "开启拥塞控制之后，Xray 会自动监测网络质量，当丢包严重时，会自动降低吞吐量；当网络畅通时，也会适当增加吞吐量",
+          "type": "boolean",
+          "default": false
+        },
+        "readBufferSize": {
+          "description": "单个连接的读取缓冲区大小，单位是 MB",
+          "type": "number",
+          "minimum": 0,
+          "default": 2
+        },
+        "writeBufferSize": {
+          "description": "单个连接的写入缓冲区大小，单位是 MB",
+          "type": "number",
+          "minimum": 0,
+          "default": 2
+        }
+      }
+    },
+    "GRPCObject": {
+      "description": "基于 gRPC 的传输方式。\n它基于 HTTP/2 协议，理论上可以通过其它支持 HTTP/2 的服务器（如 Nginx）进行中转。 gRPC（HTTP/2）内置多路复用，不建议使用 gRPC 与 HTTP/2 时启用 mux.cool。",
+      "properties": {
+        "authority": {
+          "description": "一个字符串，可以当 Host 来用，实现一些其它用途",
+          "type": "string"
+        },
+        "serviceName": {
+          "description": "一个字符串，指定服务名称，类似于 HTTP/2 中的 Path。 客户端会使用此名称进行通信，服务端会验证服务名称是否匹配",
+          "type": "string"
+        },
+        "user_agent": {
+          "description": "（客户端配置） 设置 gRPC 的用户代理，可能能防止某些 CDN 阻止 gRPC 流量",
+          "type": "string"
+        },
+        "multiMode": {
+          "description": "（客户端配置） 这是一个 实验性 选项，可能不会被长期保留，也不保证跨版本兼容。此模式在 测试环境中 能够带来约 20% 的性能提升，实际效果因传输速率不同而不同",
+          "type": "boolean",
+          "default": false
+        },
+        "idle_timeout": {
+          "description": "（客户端配置） 单位秒，当这段时间内没有数据传输时，将会进行健康检查。如果此值设置为 10 以下，将会使用 10，即最小值",
+          "type": "number",
+          "minimum": 10
+        },
+        "health_check_timeout": {
+          "description": "（客户端配置） 单位秒，健康检查的超时时间。如果在这段时间内没有完成健康检查，且仍然没有数据传输时，即认为健康检查失败",
+          "type": "number",
+          "default": 20
+        },
+        "permit_without_stream": {
+          "description": "（客户端配置） true 允许在没有子连接时进行健康检查",
+          "type": "boolean",
+          "default": false
+        },
+        "initial_windows_size": {
+          "description": "（客户端配置） h2 Stream 初始窗口大小。当值小于等于 0 时，此功能不生效。当值大于 65535 时，动态窗口机制（Dynamic Window）会被禁用。默认值为 0，即不生效",
+          "type": "number"
+        }
+      }
+    },
+    "WebSocketObject": {
+      "description": "使用标准的 WebSocket 来传输数据。\nWebSocket 连接可以被其它 HTTP 服务器（如 Nginx）分流，也可以被 VLESS fallbacks path 分流。",
+      "properties": {
+        "acceptProxyProtocol": {
+          "description": "（服务端配置） 指示是否接收 PROXY protocol",
+          "type": "boolean"
+        },
+        "path": {
+          "description": "WebSocket 所使用的 HTTP 协议路径，默认值为 `/`",
+          "type": "string"
+        },
+        "host": {
+          "description": "WebSocket 的HTTP请求中所发送的host，默认值为空。若服务端值为空时，不验证客户端发送来的host值",
+          "type": "string"
+        },
+        "headers": {
+          "description": "（客户端配置） 自定义 HTTP 头，一个键值对，每个键表示一个 HTTP 头的名称，对应的值是字符串",
+          "type": "object",
+          "additionalProperties": { "type": "string" },
+          "default": {}
+        },
+        "heartbeatPeriod": {
+          "description": "指定间隔固定时间发送一个 Ping message 保活连接。不指定或指定为0时不发送 Ping message，为当前默认行为",
+          "type": "integer"
+        }
+      }
+    },
+    "HttpUpgradeObject": {
+      "description": "一个实现了类似于 WebSocket 进行 HTTP 1.1 升级请求和响应的协议，这使得它可以像 WebSocket 一样可以被CDN或者Nginx进行反代，但无需实现 WebSocket 协议的其他部分，所以具有更高的效率。 其设计不推荐单独使用，而是和TLS等安全协议一起工作",
+      "properties": {
+        "acceptProxyProtocol": {
+          "description": "（服务端配置） 指示是否接收 PROXY protocol",
+          "type": "boolean"
+        },
+        "path": {
+          "description": "HTTPUpgrade 所使用的 HTTP 协议路径，默认值为 `/`",
+          "type": "string"
+        },
+        "host": {
+          "description": "HTTPUpgrade 的HTTP请求中所发送的host，默认值为空。若服务端值为空时，不验证客户端发送来的host值",
+          "type": "string"
+        },
+        "headers": {
+          "description": "（客户端配置） 自定义 HTTP 头，一个键值对，每个键表示一个 HTTP 头的名称，对应的值是字符串",
+          "type": "object",
+          "additionalProperties": { "type": "string" },
+          "default": {}
+        }
+      }
+    },
+    "HysteriaObject": {
+      "description": "Hysteria2 的底层 QUIC 传输的 Xray 实现，通常需要搭配 hysteria2 出站 使用",
+      "properties": {
+        "version": {
+          "description": "Hysteria 版本，必须为 2",
+          "type": "integer",
+          "const": 2
+        },
+        "auth": {
+          "description": "Hysteria 认证密码，服务端和客户端需要保持一致",
+          "type": "string"
+        },
+        "up": {
+          "description": "限制的上传速率",
+          "type": "string",
+          "default": "0"
+        },
+        "down": {
+          "description": "限制的下载速率",
+          "type": "string",
+          "default": "0"
+        },
+        "udphop": {
+          "description": "UDP 端口跳跃配置",
+          "properties": {
+            "port": {
+              "description": "跳跃的端口范围，可以是一个数值类型的字符串，如 `1234`；或者一个数值范围，如 `1145-1919` 表示端口 1145 到端口 1919，这 775 个端口。可以使用逗号进行分段，如 11,13,15-17 表示端口 11、端口 13、端口 15 到端口 17 这 5 个端口",
+              "type": "string"
+            },
+            "interval": {
+              "description": "interval 为端口跳跃间隔，单位为秒，至少为 5，默认 30 秒",
+              "type": "integer",
+              "default": 30
+            }
+          }
+        },
+        "initStreamReceiveWindow": {
+          "description": " QUIC 窗口参数",
+          "type": "number"
+        },
+        "maxStreamReceiveWindow": {
+          "description": " QUIC 窗口参数",
+          "type": "number"
+        },
+        "initConnectionReceiveWindow": {
+          "description": " QUIC 窗口参数",
+          "type": "number"
+        },
+        "maxConnectionReceiveWindow": {
+          "description": " QUIC 窗口参数",
+          "type": "number"
+        },
+        "maxIdleTimeout": {
+          "title": "最长空闲超时时间（秒）",
+          "description": "服务器会在多长时间没有收到任何客户端数据后关闭连接，范围为 4~120 秒，默认为 30 秒",
+          "type": "number",
+          "minimum": 4,
+          "maximum": 120,
+          "default": 30
+        },
+        "keepAlivePeriod": {
+          "title": "QUIC KeepAlive 间隔（秒）",
+          "description": "范围为 2~60 秒。默认禁用",
+          "type": "number",
+          "minimum": 2,
+          "maximum": 60
+        },
+        "disablePathMTUDiscovery": {
+          "description": "是否禁用路径 MTU 发现",
+          "type": "boolean"
+        }
+      }
+    },
+    "SockoptObject": {},
+    "FinalMaskObject": {},
+    "FallbackObject": {
+      "title": "Fallback 回落配置",
+      "properties": {
+        "name": {
+          "title": "域名匹配",
+          "description": "尝试匹配 TLS SNI (Server Name Indication)，空为任意",
+          "type": "string",
+          "default": ""
+        },
+        "alpn": {
+          "title": "ALPN 协商匹配",
+          "description": "尝试匹配 TLS ALPN 协商结果，空为任意",
+          "type": "string",
+          "default": ""
+        },
+        "path": {
+          "title": "HTTP 路径匹配",
+          "description": "尝试匹配首包 HTTP PATH，空为任意。非空则必须以 / 开头，不支持 h2c ",
+          "anyOf": [
+            { "type": "string", "pattern": "^/" },
+            {
+              "type": "string",
+              "maxLength": 0
+            }
+          ],
+          "default": ""
+        },
+        "dest": {
+          "title": "流量去向",
+          "description": "决定 TLS 解密后 TCP 流量的去向。",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 65535
+            }
+          ]
+        },
+        "xver": {
+          "title": "PROXY protocol 版本",
+          "description": "专用于传递请求的真实来源 IP 和端口，填版本 1 或 2，默认为 0，即不发送。",
+          "enum": [0, 1, 2],
+          "default": 0
+        }
+      },
+      "required": ["dest"]
+    },
+    "MapObject": {
+      "type": "object",
+      "description": "纯 Map 对象，兼容未写的 Object",
+      "additionalProperties": true
+    }
+  }
+}
