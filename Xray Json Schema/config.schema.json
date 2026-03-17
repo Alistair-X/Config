@@ -1798,8 +1798,7 @@
                 "rawSettings": {
                   "$ref": "#/definitions/RawObject"
                 }
-              },
-              "required": ["rawSettings"]
+              }
             },
             {
               "properties": {
@@ -1820,9 +1819,7 @@
                 "kcpSettings": {
                   "$ref": "#/definitions/KcpObject"
                 }
-              },
-
-              "required": ["kcpSettings"]
+              }
             },
             {
               "properties": {
