@@ -1,5 +1,4 @@
 {
-  "workbench.colorTheme": "Default Light Modern",
   // 文件夹缩进
   "workbench.tree.indent": 15,
   // 文件夹选中高亮
@@ -8,7 +7,9 @@
   "workbench.colorCustomizations": {
     "tree.indentGuidesStroke": "#87b5eb"
   },
+  "workbench.colorTheme": "VS Code Light",
   "workbench.iconTheme": "vscode-icons",
+  "workbench.browser.openLocalhostLinks": true,
   "editor.fontFamily": "JetBrains Mono, LXGW WenKai Mono, Consolas, 'Courier New', monospace",
   "editor.quickSuggestions": {
     "strings": "on",
@@ -29,6 +30,7 @@
   "C_Cpp.inlayHints.autoDeclarationTypes.enabled": true,
   "C_Cpp.inlayHints.parameterNames.enabled": true,
   "C_Cpp.inlayHints.referenceOperator.enabled": true,
+  "C_Cpp.intelliSenseEngine": "disabled",
   "csharp.inlayHints.enableInlayHintsForTypes": true,
   "csharp.inlayHints.enableInlayHintsForLambdaParameterTypes": true,
   "csharp.inlayHints.enableInlayHintsForImplicitVariableTypes": true,
@@ -45,18 +47,17 @@
   "go.inlayHints.parameterNames": true,
   "go.inlayHints.rangeVariableTypes": true,
   "go.toolsManagement.autoUpdate": true,
+  "julia.symbolCacheDownload": true,
+  "julia.enableCrashReporter": false,
+  "js/ts.experimental.useTsgo": true,
   "js/ts.inlayHints.functionLikeReturnTypes.enabled": true,
   "js/ts.inlayHints.parameterTypes.enabled": true,
   "js/ts.inlayHints.propertyDeclarationTypes.enabled": true,
   "js/ts.inlayHints.variableTypes.enabled": true,
   "js/ts.inlayHints.enumMemberValues.enabled": true,
-  "vue.inlayHints.destructuredProps": true,
-  "vue.inlayHints.inlineHandlerLeading": true,
-  "vue.inlayHints.missingProps": true,
-  "vue.inlayHints.optionsWrapper": true,
-  "vue.inlayHints.vBindShorthand": true,
-  "debugpy.showPythonInlineValues": true,
+  "python.defaultInterpreterPath": "d:\\Dev\\Python\\Python314\\python.exe",
   "python-envs.terminal.showActivateButton": true,
+  "debugpy.showPythonInlineValues": true,
   "python.createEnvironment.trigger": "off",
   "python-envs.defaultEnvManager": "ms-python.python:system",
   "python.analysis.inlayHints.functionReturnTypes": true,
@@ -84,5 +85,12 @@
   "rust-analyzer.inlayHints.lifetimeElisionHints.useParameterNames": true,
   "rust-analyzer.inlayHints.expressionAdjustmentHints.hideOutsideUnsafe": true,
   "rust-analyzer.inlayHints.implicitSizedBoundHints.enable": true,
-  "zig.zls.enabled": "on"
+  "zig.path": "zig",
+  "zig.zls.enabled": "on",
+  "svelte.enable-ts-plugin": true,
+  "vue.inlayHints.destructuredProps": true,
+  "vue.inlayHints.inlineHandlerLeading": true,
+  "vue.inlayHints.missingProps": true,
+  "vue.inlayHints.optionsWrapper": true,
+  "vue.inlayHints.vBindShorthand": true
 }
