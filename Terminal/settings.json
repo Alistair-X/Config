@@ -83,12 +83,18 @@
                 "source": "Microsoft.WSL"
             },
             {
+                "font": {
+                    "face": "JetBrainsMono Nerd Font Mono, Maple Mono Normal"
+                },
                 "guid": "{e85b9b2c-f2aa-5902-8ee2-9699bd4ba177}",
                 "hidden": false,
                 "name": "Developer Command Prompt for VS 18",
                 "source": "Windows.Terminal.VisualStudio"
             },
             {
+                "font": {
+                    "face": "JetBrainsMono Nerd Font Mono, Maple Mono Normal"
+                },
                 "guid": "{70be95fa-7013-5f98-93b9-c3e7b71f4ab4}",
                 "hidden": false,
                 "name": "Developer PowerShell for VS 18",
@@ -96,7 +102,7 @@
             },
             {
                 "font": {
-                    "face": "JetBrainsMono Nerd Font Mon, Maple Mono Normal"
+                    "face": "JetBrainsMono Nerd Font Mono, Maple Mono Normal"
                 },
                 "guid": "{df3a0753-009a-5158-a08f-39180f692b8d}",
                 "hidden": false,
@@ -116,6 +122,15 @@
                 "guid": "{42101b2e-b3a3-534c-aafd-5dddb3d6bf1a}",
                 "hidden": false,
                 "name": "podman-machine-default",
+                "source": "Microsoft.WSL"
+            },
+            {
+                "font": {
+                    "face": "JetBrainsMono Nerd Font Mono, Maple Mono Normal"
+                },
+                "guid": "{984f5c3f-a155-5cb9-ba28-018e15fbde13}",
+                "hidden": false,
+                "name": "Debian",
                 "source": "Microsoft.WSL"
             }
         ]
