@@ -7,41 +7,82 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
-  "vim_mode": true,
-  "telemetry": {
-    "diagnostics": true,
-    "metrics": true
-  },
-  "git": {
-    "inline_blame": {
-      "enabled": true
-    }
-  },
-  "minimap": {
-    "show": "auto"
-  },
   "base_keymap": "VSCode",
   "edit_predictions": {
-    "mode": "eager"
+    "provider": "zed",
+    "mode": "eager",
   },
   "icon_theme": "Material Icon Theme",
   "ui_font_size": 16,
   "buffer_font_family": "JetBrains Mono NL",
+  "buffer_font_fallbacks": [
+    "Maple Mono Normal"
+  ],
   "buffer_font_size": 16,
   "terminal": {
-    "font_family": "JetBrainsMono Nerd Font Mono"
+    "font_family": "JetBrainsMono Nerd Font Mono",
   },
   "theme": {
     "mode": "system",
     "light": "Ayu Light",
-    "dark": "Ayu Dark"
+    "dark": "Ayu Dark",
   },
   "title_bar": {
-    "show_menus": true
+    "show_branch_status_icon": true,
+    "show_menus": true,
+  },
+  "tab_bar": {
+    "show": true,
+  },
+  "tabs": {
+    "file_icons": true,
+    "git_status": true,
+  },
+  "diagnostics": {
+    "inline": {
+      "enabled": true,
+    },
   },
   "indent_guides": {
     "active_line_width": 3,
-    "coloring": "indent_aware"
-  }
+    "coloring": "indent_aware",
+  },
+  "code_lens": "on",
+  "inlay_hints": {
+    "enabled": true,
+  },
+  "colorize_brackets": true,
+  "minimap": {
+    "show": "auto",
+  },
+  "show_edit_predictions": false,
+  "telemetry": {
+    "diagnostics": true,
+    "metrics": true,
+  },
+  "git": {
+    "inline_blame": {
+      "enabled": true,
+    },
+  },
+  "cli_default_open_behavior": "existing_window",
+  "outline_panel": {
+    "dock": "left",
+  },
+  "collaboration_panel": {
+    "dock": "left",
+  },
+  "agent": {
+    "dock": "right",
+    "favorite_models": [],
+    "model_parameters": [],
+  },
+  "project_panel": {
+    "dock": "left",
+    "git_status_indicator": true,
+  },
+  "git_panel": {
+    "dock": "left",
+    "tree_view": false,
+  },
 }
-
