@@ -2,6 +2,9 @@
 
 command_timeout = 3000
 
+# Set color palette 
+palette = 'catppuccin_frappe'
+
 format = """
 [](red)\
 $os\
@@ -11,39 +14,50 @@ $directory\
 [](bg:yellow fg:peach)\
 $git_branch\
 $git_status\
-[](fg:yellow bg:green)\
-$bun\
+[](bg:green fg:yellow)\
 $c\
 $cpp\
 $dart\
-$deno\
-$dotnet\
 $elixir\
 $elm\
 $golang\
-$gradle\
 $haskell\
 $java\
 $julia\
 $kotlin\
 $lua\
-$nodejs\
 $nim\
 $python\
 $ruby\
 $rust\
 $scala\
+$typst\
 $zig\
-[](fg:green bg:sapphire)\
+[](bg:sky fg:green)\
+$bun\
+$deno\
+$dotnet\
+$nodejs\
+[](bg:sapphire fg:sky)\
+$gradle\
+$maven\
+$container\
 $docker_context\
 $kubernetes\
-[](fg:sapphire bg:lavender)\
+[](bg:lavender fg:sapphire)\
 $time\
 [](fg:lavender)\
 $line_break\
 $character"""
 
-palette = 'catppuccin_frappe'
+# Replace the '❯' symbol in the prompt with '$'
+[character]
+success_symbol = '[\$](bold white)'
+error_symbol = '[✗](bold red)'
+vimcmd_symbol = '[\$](bold green)'
+vimcmd_replace_one_symbol = '[\$](bold purple)'
+vimcmd_replace_symbol = '[\$](bold purple)'
+vimcmd_visual_symbol = '[\$](bold yellow)'
 
 [os]
 style = "bg:red fg:crust"
@@ -75,7 +89,7 @@ RedHatEnterprise = "󱄛"
 show_always = true
 style_user = "bg:red fg:crust"
 style_root = "bg:red fg:crust"
-format = '[ $user]($style)'
+format = '[ $user ]($style)'
 disabled = false
 
 [directory]
@@ -91,152 +105,170 @@ truncation_symbol = "…/"
 "Pictures" = " "
 "Developer" = "󰲋 "
 
-[git_branch]
-symbol = ""
-style = "bg:yellow"
-format = '[[ $symbol $branch ](fg:crust bg:yellow)]($style)'
-
-[git_status]
-style = "bg:yellow"
-format = '[[($all_status$ahead_behind )](fg:crust bg:yellow)]($style)'
-
-# language
-[bun]
-symbol = " "
-style = "bg:green"
-format = '[[ $symbol( $version) ](fg:crust bg:green)]($style)'
-
-[c]
-symbol = " "
-style = "bg:green"
-format = '[[ $symbol( $version) ](fg:crust bg:green)]($style)'
-
-[cpp]
-symbol = " "
-style = "bg:green"
-format = '[[ $symbol( $version) ](fg:crust bg:green)]($style)'
-
-[dart]
-symbol = " "
-style = "bg:green"
-format = '[[ $symbol( $version) ](fg:crust bg:green)]($style)'
-
-[deno]
-symbol = " "
-style = "bg:green"
-format = '[[ $symbol( $version) ](fg:crust bg:green)]($style)'
-
-[docker_context]
-symbol = " "
-style = "bg:#06969A"
-format = '[ $symbol $context ]($style)'
-
-[dotnet]
-symbol = " "
-style = "bg:green"
-format = '[[ $symbol( $version) ](fg:crust bg:green)]($style)'
-
-[elixir]
-symbol = " "
-style = "bg:green"
-format = '[[ $symbol( $version) ](fg:crust bg:green)]($style)'
-
-[elm]
-symbol = " "
-style = "bg:green"
-format = '[[ $symbol( $version) ](fg:crust bg:green)]($style)'
-
-[golang]
-symbol = "󰟓 "
-style = "bg:green"
-format = '[[ $symbol( $version) ](fg:crust bg:green)]($style)'
-
-[gradle]
-symbol = " "
-style = "bg:green"
-format = '[[ $symbol( $version) ](fg:crust bg:green)]($style)'
-
-[haskell]
-symbol = " "
-style = "bg:green"
-format = '[[ $symbol( $version) ](fg:crust bg:green)]($style)'
-
-[java]
-symbol = " "
-style = "bg:green"
-format = '[[ $symbol( $version) ](fg:crust bg:green)]($style)'
-
-[julia]
-symbol = " "
-style = "bg:green"
-format = '[[ $symbol( $version) ](fg:crust bg:green)]($style)'
-
-[kotlin]
-symbol = " "
-style = "bg:green"
-format = '[[ $symbol( $version) ](fg:crust bg:green)]($style)'
-
-[kubernetes]
-symbol = " "
-style = "bg:green"
-format = '[[ $symbol( $version) ](fg:crust bg:green)]($style)'
-
-[lua]
-symbol = " "
-style = "bg:green"
-format = '[[ $symbol( $version) ](fg:crust bg:green)]($style)'
-
-[nodejs]
-symbol = "󰎙 "
-style = "bg:green"
-format = '[[ $symbol( $version) ](fg:crust bg:green)]($style)'
-
-[nim]
-symbol = " "
-style = "bg:green"
-format = '[[ $symbol( $version) ](fg:crust bg:green)]($style)'
-
-[python]
-symbol = " "
-style = "bg:green"
-format = '[[ $symbol( $version) ](fg:crust bg:green)]($style)'
-
-[ruby]
-symbol = " "
-style = "bg:green"
-format = '[[ $symbol( $version) ](fg:crust bg:green)]($style)'
-
-[rust]
-symbol = " "
-style = "bg:green"
-format = '[[ $symbol( $version) ](fg:crust bg:green)]($style)'
-
-[scala]
-symbol = " "
-style = "bg:green"
-format = '[[ $symbol( $version) ](fg:crust bg:green)]($style)'
-
-[zig]
-symbol = " "
-style = "bg:green"
-format = '[[ $symbol( $version) ](fg:crust bg:green)]($style)'
+# [cmd_duration]
+# show_milliseconds = true
+# style = "fg:crust bg:lavender"
+# format = "[ 󱦟 $duration ]($style)"
 
 [time]
 disabled = false
 time_format = "%R"             # Hour:Minute Format
-style = "bg:lavender"
-format = '[[  $time ](fg:crust bg:lavender)]($style)'
+style = "fg:crust bg:lavender"
+format = '[  $time ]($style)'
 
-# Replace the '❯' symbol in the prompt with '$'
-[character]
-success_symbol = '[\$](bold white)'
-error_symbol = '[\$](bold red)'
-vimcmd_symbol = '[\$](bold green)'
-vimcmd_replace_one_symbol = '[\$](bold purple)'
-vimcmd_replace_symbol = '[\$](bold purple)'
-vimcmd_visual_symbol = '[\$](bold yellow)'
+[git_branch]
+symbol = ""
+style = "fg:crust bg:yellow"
+format = '[ $symbol $branch ]($style)'
 
+[git_status]
+style = "fg:crust bg:yellow"
+format = '[($all_status $ahead_behind )]($style)'
 
+# language
+[c]
+symbol = " "
+style = "bg:green fg:crust"
+format = '[ $symbol( $version) ]($style)'
+
+[cpp]
+symbol = " "
+style = "bg:green fg:crust"
+format = '[ $symbol( $version) ]($style)'
+
+[dart]
+symbol = " "
+style = "bg:green fg:crust"
+format = '[ $symbol( $version) ]($style)'
+
+[elixir]
+symbol = " "
+style = "bg:green fg:crust"
+format = '[ $symbol( $version) ]($style)'
+
+[elm]
+symbol = " "
+style = "bg:green fg:crust"
+format = '[ $symbol( $version) ]($style)'
+
+[golang]
+symbol = "󰟓 "
+style = "bg:green fg:crust"
+format = '[ $symbol( $version) ]($style)'
+
+[haskell]
+symbol = " "
+style = "bg:green fg:crust"
+format = '[ $symbol( $version) ]($style)'
+
+[java]
+symbol = " "
+style = "bg:green fg:crust"
+format = '[ $symbol( $version) ]($style)'
+
+[julia]
+symbol = " "
+style = "bg:green fg:crust"
+format = '[ $symbol( $version) ]($style)'
+
+[kotlin]
+symbol = " "
+style = "bg:green fg:crust"
+format = '[ $symbol( $version) ]($style)'
+
+[lua]
+symbol = " "
+style = "bg:green fg:crust"
+format = '[ $symbol( $version) ]($style)'
+
+[nim]
+symbol = " "
+style = "bg:green fg:crust"
+format = '[ $symbol( $version) ]($style)'
+
+[python]
+symbol = " "
+style = "bg:green fg:crust"
+format = '[ $symbol( $version) ]($style)'
+
+[ruby]
+symbol = " "
+style = "bg:green fg:crust"
+format = '[ $symbol( $version) ]($style)'
+
+[rust]
+symbol = " "
+style = "bg:green fg:crust"
+format = '[ $symbol( $version) ]($style)'
+
+[scala]
+symbol = " "
+style = "bg:green fg:crust"
+format = '[ $symbol( $version) ]($style)'
+
+[typst]
+symbol = " "
+style = "bg:green fg:crust"
+format = '[ $symbol( $version) ]($style)'
+
+[xmake]
+symbol = "△ "
+style = "bg:green fg:crust"
+format = '[ $symbol( $version) ]($style)'
+
+[zig]
+symbol = " "
+style = "bg:green fg:crust"
+format = '[ $symbol( $version) ]($style)'
+
+# runtime
+[bun]
+symbol = " "
+style = "bg:sky fg:crust"
+format = '[ $symbol( $version) ]($style)'
+
+[deno]
+symbol = " "
+style = "bg:sky fg:crust"
+format = '[ $symbol( $version) ]($style)'
+
+[dotnet]
+symbol = " "
+style = "bg:sky fg:crust"
+format = '[ $symbol( $version) ]($style)'
+
+[nodejs]
+symbol = "󰎙 "
+style = "bg:sky fg:crust"
+format = '[ $symbol( $version) ]($style)'
+
+# software
+[container]
+symbol = " "
+style = "bg:sapphire fg:crust"
+format = "[ $symbol $name ]($style)"
+
+[docker_context]
+symbol = " "
+style = "bg:sapphire fg:crust"
+format = '[ $symbol $context ]($style)'
+
+[gradle]
+symbol = " "
+style = "bg:sapphire fg:crust"
+format = '[ $symbol( $version) ]($style)'
+
+[kubernetes]
+symbol = " "
+style = "bg:sapphire fg:crust"
+format = '[ $symbol( $version) ]($style)'
+
+[maven]
+symbol = " "
+style = "bg:sapphire fg:crust"
+format = '[ $symbol( $version) ]($style)'
+
+# theme
 [palettes.catppuccin_mocha]
 rosewater = "#f5e0dc"
 flamingo = "#f2cdcd"
