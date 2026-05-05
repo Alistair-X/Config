@@ -197,25 +197,22 @@
       "additionalProperties": false,
       "properties": {
         "hosts": {
-          "title": "静态 IP 列表",
+          "title": "静态 IP 列表，其值为一系列的 '域名': '地址' 或 '域名': ['地址 1','地址 2']。其中地址可以是 IP 或者域名。在解析域名时，核心将检查全部映射条目并返回全部匹配成功的 IP 地址。如果未命中，则进入 DNS 查询阶段",
           "type": "object",
+          "propertyNames": {
+            "$ref": "#/$defs/DomainName"
+          },
           "additionalProperties": {
             "anyOf": [
               {
-                "type": "string",
-                "format": "ipv4"
+                "$ref": "#/$defs/IPOrDomain"
               },
               {
-                "type": "string",
-                "format": "ipv6"
-              },
-              {
-                "type": "string",
-                "format": "hostname"
-              },
-              {
-                "type": "string",
-                "format": "idn-hostname"
+                "type": "array",
+                "minLength": 1,
+                "items": {
+                  "$ref": "#/$defs/IPOrDomain"
+                }
               }
             ]
           },
@@ -227,7 +224,7 @@
         },
         "servers": {
           "title": "DNS 服务器列表",
-          "description": "支持 DNS 地址 (字符串形式) 和 ServerObject ",
+          "description": "支持 DNS 地址 (字符串形式) 和 DnsServerObject ",
           "type": "array",
           "items": {
             "anyOf": [
@@ -235,30 +232,67 @@
                 "$ref": "#/$defs/DnsAddress"
               },
               {
-                "$ref": "#/$defs/ServerObject"
+                "$ref": "#/$defs/DnsServerObject"
               }
             ]
           }
         },
         "clientIp": {
           "title": "客户端 IP",
-          "description": "用于 DNS 查询时通知服务器以指定 IP 位置。不能是私有地址",
-          "anyOf": [
-            {
-              "type": "string",
-              "format": "ipv4"
-            },
-            {
-              "type": "string",
-              "format": "ipv6"
-            }
-          ],
+          "description": "EDNS Client Subnet 扩展中使用的 IP 地址。用于 DNS 查询时通知服务器以指定 IP 位置。不能是私有地址",
+          "$ref": "#/$defs/IPAddress",
           "examples": [
             "1.2.3.4"
           ]
         },
+        "queryStrategy": {
+          "description": "限制 DNS 模块中所有服务器的能力，以及由 Xray 自身发起的 IP 查询类型的默认值",
+          "type": "string",
+          "enum": [
+            "UseIP",
+            "UseIPv4",
+            "UseIPv6",
+            "UseSystem"
+          ]
+        },
+        "disableCache": {
+          "description": "是否禁用 DNS 缓存",
+          "type": "boolean",
+          "default": false
+        },
+        "serveStale": {
+          "description": "是否启用 DNS 乐观缓存",
+          "type": "boolean",
+          "default": false
+        },
+        "serveExpiredTTL": {
+          "description": "乐观缓存有效期，单位是秒，默认为 0 即永不过期",
+          "type": "integer",
+          "minimum": 0,
+          "default": 0
+        },
+        "disableFallback": {
+          "description": "是否禁用 DNS 的 fallback 查询",
+          "type": "boolean",
+          "default": false
+        },
+        "disableFallbackIfMatch": {
+          "description": " 当 DNS 服务器的优先匹配域名列表命中时，是否禁用 fallback 查询",
+          "type": "boolean",
+          "default": false
+        },
+        "enableParallelQuery": {
+          "description": "是否启用并行查询",
+          "type": "boolean",
+          "default": false
+        },
+        "useSystemHosts": {
+          "description": "是否将系统 hosts 文件附加到内置 DNS 的 hosts 中",
+          "type": "boolean"
+        },
         "tag": {
           "title": "DNS 代理标识",
+          "description": "由内置 DNS 发出的查询流量，除 localhost、fakedns、TCPL、DOHL 和 DOQL 模式外，都可以用此标识在路由使用 inboundTag 进行匹配",
           "type": "string",
           "examples": [
             "dns_inbound"
@@ -324,7 +358,7 @@
         "fakedns"
       ]
     },
-    "ServerObject": {
+    "DnsServerObject": {
       "title": "DNS 服务器",
       "type": "object",
       "additionalProperties": false,
@@ -333,7 +367,8 @@
           "$ref": "#/$defs/DnsAddress"
         },
         "port": {
-          "title": "DNS 服务器端口"
+          "title": "DNS 服务器端口",
+          "$ref": "#/$defs/Port"
         },
         "domains": {
           "title": "域名匹配列表",
@@ -383,6 +418,44 @@
           "examples": [
             "4000"
           ]
+        },
+        "finalQuery": {
+          "description": "如果设置为真，该 DNS 服务器的请求会是最终尝试，不会触发 fallback 行为",
+          "type": "boolean"
+        },
+        "queryStrategy": {
+          "description": "若未指定，将继承自全局配置；若指定，则允许更进一步限制此服务器能力，以及设置由 Xray 自身发起的 IP 查询类型的默认值（它始终受全局 queryStrategy 的约束）",
+          "type": "string",
+          "enum": [
+            "UseIP",
+            "UseIPv4",
+            "UseIPv6",
+            "UseSystem"
+          ]
+        },
+        "tag": {
+          "description": "DNS 标签。若未指定，将继承自全局配置，也可以在这里覆盖全局配置",
+          "type": "string"
+        },
+        "clientIP": {
+          "description": "EDNS Client Subnet 扩展中使用的 IP 地址。若未指定，将继承自全局配置，也可以在这里覆盖全局配置",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "disableCache": {
+          "description": " 禁用 DNS 缓存。若未指定，将继承自全局配置，也可以在这里覆盖全局配置",
+          "type": "boolean"
+        },
+        "serveStale": {
+          "description": "启用 DNS 乐观缓存。若未指定，将继承自全局配置，也可以在这里覆盖全局配置",
+          "type": "boolean"
+        },
+        "serveExpiredTTL": {
+          "description": "乐观缓存有效期。若未指定，将继承自全局配置，也可以在这里覆盖全局配置",
+          "type": "integer",
+          "minimum": 0
         }
       },
       "anyOf": [
@@ -1528,7 +1601,9 @@
           "title": "用户邮箱",
           "description": "用于区分不同用户的流量（会体现在日志、统计中）",
           "type": "string",
-          "format": "email"
+          "examples": [
+            "love@xray.com"
+          ]
         },
         "flow": {
           "title": "流控模式",
@@ -1672,7 +1747,9 @@
           "title": "用户邮箱",
           "description": "用于区分不同用户的流量（会体现在日志、统计中）",
           "type": "string",
-          "format": "email"
+          "examples": [
+            "love@xray.com"
+          ]
         }
       }
     },
@@ -1974,7 +2051,10 @@
       "properties": {
         "email": {
           "description": "邮件地址，用于标识用户",
-          "type": "string"
+          "type": "string",
+          "examples": [
+            "love@xray.com"
+          ]
         },
         "address": {
           "description": "Shadowsocks 服务端地址，支持 IPv4、IPv6 和域名",
@@ -2033,18 +2113,6 @@
         "port",
         "method",
         "password"
-      ],
-      "examples": [
-        {
-          "email": "love@xray.com",
-          "address": "127.0.0.1",
-          "port": 1234,
-          "method": "加密方式",
-          "password": "密码",
-          "uot": true,
-          "UoTVersion": 2,
-          "level": 0
-        }
       ]
     },
     "ScoksOutboundConfigurationObject": {
@@ -2094,20 +2162,13 @@
         "email": {
           "title": "邮件地址",
           "description": "用于标识用户。如果对接服务端需要认证则选填，否则不要包含此项",
-          "type": "string"
+          "type": "string",
+          "examples": [
+            "love@xray.com"
+          ]
         }
       },
-      "required": [],
-      "examples": [
-        {
-          "address": "127.0.0.1",
-          "port": 1234,
-          "user": "test user",
-          "pass": "test pass",
-          "level": 0,
-          "email": "love@xray.com"
-        }
-      ]
+      "required": []
     },
     "WireguardOutboundConfigurationObject": {
       "description": "Wireguard 出站数据协议",
@@ -3698,6 +3759,49 @@
       "required": [
         "dest"
       ]
+    },
+    "IPAddress": {
+      "description": "IPv4 或 IPv6 地址",
+      "anyOf": [
+        {
+          "type": "string",
+          "format": "ipv4"
+        },
+        {
+          "type": "string",
+          "format": "ipv6"
+        }
+      ]
+    },
+    "DomainName": {
+      "description": "域名",
+      "anyOf": [
+        {
+          "type": "string",
+          "format": "hostname"
+        },
+        {
+          "type": "string",
+          "format": "idn-hostname"
+        }
+      ]
+    },
+    "IPOrDomain": {
+      "description": "域名或地址",
+      "anyOf": [
+        {
+          "$ref": "#/$defs/IPAddress"
+        },
+        {
+          "$ref": "#/$defs/DomainName"
+        }
+      ]
+    },
+    "Port": {
+      "description": "端口，工作在传输层（TCP/UDP）",
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 65535
     }
   }
 }
