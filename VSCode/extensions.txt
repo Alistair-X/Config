@@ -7,7 +7,6 @@ bierner.github-markdown-preview
 bierner.markdown-checkbox
 bierner.markdown-emoji
 bierner.markdown-footnotes
-bierner.markdown-mermaid
 bierner.markdown-preview-github-styles
 bierner.markdown-yaml-preamble
 bradlc.vscode-tailwindcss
@@ -25,8 +24,6 @@ editorconfig.editorconfig
 elijah-potter.harper
 esbenp.prettier-vscode
 fill-labs.dependi
-github.copilot-chat
-github.vscode-github-actions
 golang.go
 grapecity.gc-excelviewer
 humao.rest-client
@@ -34,7 +31,7 @@ ionide.ionide-fsharp
 james-yu.latex-workshop
 jeff-hykin.better-cpp-syntax
 jetbrains.j2k-vscode
-jetbrains.kotlin
+jetbrains.kotlin-server
 julialang.language-julia
 llvm-vs-code-extensions.lldb-dap
 llvm-vs-code-extensions.vscode-clangd
@@ -87,14 +84,16 @@ redhat.vscode-quarkus
 redhat.vscode-xml
 redhat.vscode-yaml
 rust-lang.rust-analyzer
-stripe.markdoc-language-support
 stylelint.vscode-stylelint
 sumneko.lua
 svelte.svelte-vscode
 tamasfe.even-better-toml
+tauri-apps.tauri-vscode
 tboox.xmake-vscode
+theqtcompany.qt-core
+theqtcompany.qt-qml
 tomoki1207.pdf
-typescriptteam.native-preview
+vadimcn.vscode-lldb
 vitest.explorer
 vmware.vscode-boot-dev-pack
 vmware.vscode-spring-boot
@@ -109,4 +108,5 @@ vscjava.vscode-spring-boot-dashboard
 vscjava.vscode-spring-initializr
 vscode-icons-team.vscode-icons
 vue.volar
+yoavbls.pretty-ts-errors
 ziglang.vscode-zig

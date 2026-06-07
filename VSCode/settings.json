@@ -7,10 +7,10 @@
   "workbench.colorCustomizations": {
     "tree.indentGuidesStroke": "#87b5eb"
   },
-  "workbench.colorTheme": "VS Code Light",
+  "workbench.colorTheme": "Light 2026",
   "workbench.iconTheme": "vscode-icons",
   "workbench.browser.openLocalhostLinks": true,
-  "editor.fontFamily": "JetBrains Mono, LXGW WenKai Mono, Consolas, 'Courier New', monospace",
+  "editor.fontFamily": "JetBrains Mono, Maple Mono NL NF CN, Consolas, 'Courier New', monospace",
   "editor.quickSuggestions": {
     "strings": "on",
     "comments": "on"
@@ -55,7 +55,7 @@
   "js/ts.inlayHints.propertyDeclarationTypes.enabled": true,
   "js/ts.inlayHints.variableTypes.enabled": true,
   "js/ts.inlayHints.enumMemberValues.enabled": true,
-  "python.defaultInterpreterPath": "d:\\Dev\\Python\\Python314\\python.exe",
+  "python.defaultInterpreterPath": "",
   "python-envs.terminal.showActivateButton": true,
   "debugpy.showPythonInlineValues": true,
   "python.createEnvironment.trigger": "off",
@@ -71,6 +71,7 @@
   "python.analysis.typeEvaluation.strictDictionaryInference": true,
   "python.analysis.supportDocstringTemplate": true,
   "python.analysis.typeCheckingMode": "standard",
+  "python.analysis.enableParallelIndexing": true,
   "rust-analyzer.inlayHints.reborrowHints.enable": "always",
   "rust-analyzer.inlayHints.lifetimeElisionHints.enable": "always",
   "rust-analyzer.inlayHints.discriminantHints.enable": "always",
@@ -92,5 +93,13 @@
   "vue.inlayHints.inlineHandlerLeading": true,
   "vue.inlayHints.missingProps": true,
   "vue.inlayHints.optionsWrapper": true,
-  "vue.inlayHints.vBindShorthand": true
+  "vue.inlayHints.vBindShorthand": true,
+  "dart.previewFlutterUiGuides": true,
+  "julia.enableTelemetry": false,
+  "notebook.lineNumbers": "on",
+  "python.languageServer": "None",
+  "playwright.reuseBrowser": false,
+  "playwright.showTrace": false,
+  "playwright.runGlobalSetupOnEachRun": false,
+  "mermaidChart.showGenerateDiagramCodeLens": false
 }
